@@ -1,0 +1,33 @@
+1 - Crear un sistema de login donde cada jugador elija un usuario existente o nuevo. Se le podria agregar una potencial contraseña.
+   La idea de guardar a los jugadores en DB es guardar su puntaje para reanudar una partida, o un potencial registro de cuantas
+   partidas jugó y cuantas ganó.
+
+2 - Una vez seleccionado los jugadores, que pueden ser muchos, agregar boton de iniciar partida. Dar a elegir que jugadores de la lista
+   de jugadores va a jugar, posiblemente agregar un boton para crear un jugador(de nuevo).
+
+3 - Comienza el juego. Van a ser 11 turnos por jugador.
+
+4 - Cada jugador tiene 3 tiradas opcionales por turno. Se anuncia el primer tiro. Despues del tiro se chequean juegos grandes. En caso
+   de tener un juego grande, si el jugador decide plantar, al puntaje se le agregan 10 puntos por juego servido.
+   El jugador decide plantar o seguir tirando.
+   Si planta, se calcula el puntaje y se tacha esa jugada de la lista (eg. Si consigue poker, poker deja de estar disponible para un proximo turno.)
+   Si decide continuar, elige los dados que desea conservar y realiza el segundo tiro con los dados restantes.
+   Se chequean las posibles jugadas, se detallan(si hay) y se da la opcion de plantar o continuar.
+   Si continua, realiza el ultimo tiro igual que el anterior.
+   Se chequean las jugadas y se detallan los puntajes a elegir.
+   Se tacha la jugada elegida.
+   Se guarda el puntaje del jugador
+   Se termina el turno.
+
+5 - Se puede agregar la funcion de guardar o continuar partida.
+   Condicion para guardar partida: Que X jugador haya terminado su turno.
+
+6 - Si en algun turno, un jugador consigue una generala servida, gana automaticamente el juego.
+    Anunciar al ganador!
+
+7 - Se realiza el juego con normalidad, turno a turno, hasta que todos los jugadores hayan completado sus 11 turnos.
+    Se procede a realizar la suma del puntaje de cada jugador.
+    El jugador con el puntaje mas alto, gana. Si mas de un jugador consigue el puntaje mas alto, se considera un empate.
+    Dar la opcion de desempatar.
+    Se podria realizar una tirada de desempate. 3 tiros (un turno) y el que mas puntos obtenga, es el ganador.
+    Anunciar al ganador!
