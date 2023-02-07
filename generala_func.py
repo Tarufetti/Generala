@@ -8,20 +8,20 @@ dados_dic = {1:'       \n|       |\n|   *   |\n|       |\n       ',
             5:'       \n| *   * |\n|   *   |\n| *   * |\n       ',
             6:'       \n| *   * |\n| *   * |\n| *   * |\n       '}
 jugadas_grandes = {'escalera':20, 'full':30, 'poker':40, 'generala':50, 'generala_doble':100}
-jugadas_chicas = defaultdict(int)
 
-def tirada(dados_elegidos,dados_dic):
+def tirada(dados_elegidos):
     dados_tirados = []
     _ = input('Presione una tecla para arrojar los dados: ')
-    for i in range((5-len(dados_elegidos))):
+    for _ in range((5-len(dados_elegidos))):
         dados_tirados.append(random.randint(1,6))
     dados_elegidos.extend(dados_tirados)
-    dados_elegidos = sorted(dados_elegidos)
+    dados_elegidos.sort()
+    print(dados_elegidos)
     print(dados_dic[dados_elegidos[0]],dados_dic[dados_elegidos[1]],dados_dic[dados_elegidos[2]],dados_dic[dados_elegidos[3]],dados_dic[dados_elegidos[4]])
     return dados_elegidos
 
 
-def check_jugada(dados_elegidos,nro_tiro):
+def check_jugadas_grandes(dados_elegidos,nro_tiro):
     jugadas = []
     if dados_elegidos == [1,2,3,4,5] or dados_elegidos == [2,3,4,5,6]:
         jugadas.append('escalera')
@@ -31,9 +31,17 @@ def check_jugada(dados_elegidos,nro_tiro):
         jugadas.append('poker')
     if dados_elegidos[0] == dados_elegidos[4]:
         jugadas.append('generala')
-        if nro_tiro == 1:
+        if nro_tiro == 1 and 'generala' in jugadas:
             print('GENERALA SERVIDA!!!! Ganaste el juego!')
     return jugadas
     
-    
+def check_jugadas_chicas(dados_elegidos):
+    jugadas_chicas_dic = defaultdict(int)
+    for i in range(1,7):
+            jugadas_chicas_dic[f'{i}'] = i * dados_elegidos.count(i)
+    lista_jugadas_chicas = []
+    for k,v in jugadas_chicas_dic.items():
+        if v != 0:
+            lista_jugadas_chicas.append(f'{v} al {k}')
+    return lista_jugadas_chicas
 
