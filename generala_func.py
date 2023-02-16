@@ -33,6 +33,7 @@ def check_jugadas_grandes(dados_elegidos,nro_tiro):
         jugadas.append('generala')
         if nro_tiro == 1 and 'generala' in jugadas:
             print('GENERALA SERVIDA!!!! Ganaste el juego!')
+            #agregar fin del juego en este momento?
     return jugadas
     
 def check_jugadas_chicas(dados_elegidos):
@@ -45,3 +46,9 @@ def check_jugadas_chicas(dados_elegidos):
             lista_jugadas_chicas.append(f'{v} al {k}')
     return lista_jugadas_chicas
 
+def menu_despues_de_tirada(dados_elegidos):
+    grandes = check_jugadas_grandes(dados_elegidos, 1)
+    chicas = check_jugadas_chicas(dados_elegidos)
+    grandes.extend(chicas)
+    for i,jug in enumerate(grandes, start=1):
+        print(f'{i}- {jug}')
