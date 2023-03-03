@@ -1,5 +1,6 @@
 import random
 from collections import defaultdict
+import sys
 
 dados_dic = {1:'       \n|       |\n|   *   |\n|       |\n       ', 
             2:'       \n| *     |\n|       |\n|     * |\n       ',
@@ -53,5 +54,26 @@ def menu_despues_de_tirada(dados_elegidos):
     for i,jug in enumerate(grandes, start=1):
         print(f'{i}- {jug}')
 
+def cerrarPartida(): # Cierra el programa cuando el usuario lo desea o si finaliza la partida.
+    sys.exit()
 
-menu_despues_de_tirada(tirada([]))
+def iniciarPrograma():
+    print(">>> BIENVENIDO A LA GENERALA! <<<")
+    print("Desea iniciar una partida nueva?\nIngrese:\n- 1 para iniciar una NUEVA partida.\n- 2 para REANUDAR una partida guardada.")
+    print("- 3 para CERRAR el programa.")
+    ref_anotacion = {"1": 1, "2": 2, "3": 3}
+    opcionPartida = input("\nIngrese la opción deseada: ")
+    while opcionPartida not in ref_anotacion: # Esta es la validacion para un ingreso erróneo
+        print("\n*** ERROR! Lo ingresado no fue recibido correctamente.\nPor favor, ingrese una opción válida usando NÚMEROS.")
+        print("- 1 para iniciar una nueva partida.\n- 2 para reanudar una partida guardada.")
+        opcionPartida = input("\nPor favor, ingrese la opción deseada: ")
+    opcionPartida = int(opcionPartida)
+    if opcionPartida == 1: # Acá invoca a la funcion de iniciar una partida nueva
+        print("\nUsted a iniciado una NUEVA PARTIDA.\n")
+        nuevaPartida()
+    elif opcionPartida == 2: # Acá invoca a la función de reanudar una partida guardada
+        print("")
+        reanudarPartida()
+    elif opcionPartida == 3: # Esta opción te hace cerrar el programa y salir del juego
+        print("Muchas gracias por jugar! Vuelva Pronto!")
+        sys.exit()
