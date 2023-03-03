@@ -52,3 +52,6 @@ def menu_despues_de_tirada(dados_elegidos):
     grandes.extend(chicas)
     for i,jug in enumerate(grandes, start=1):
         print(f'{i}- {jug}')
+
+
+menu_despues_de_tirada(tirada([]))
