@@ -24,6 +24,19 @@ def tirada(dados_elegidos:list) -> list:
     print(dados_dic[dados_elegidos[0]],dados_dic[dados_elegidos[1]],dados_dic[dados_elegidos[2]],dados_dic[dados_elegidos[3]],dados_dic[dados_elegidos[4]])
     return dados_elegidos
 
+def elegir_dados(dados_elegidos:list) -> list:
+    dados= []
+    print('Elige los dados que quieras guardar para el siguiente tiro...\n')
+    for i in range(1, 6):
+        print(f'{i}: {dados_elegidos[i-1]}')
+    
+    eleccion = input('\nEscribe el numero de menu de los dados a elegir, sin comas ni espacios: ')
+    while not eleccion.isdigit():
+        eleccion = input('\nEscribe el numero de menu de los dados a elegir, sin comas ni espacios: ')
+    for i in eleccion:
+        dados.append(dados_elegidos[int(i)-1])
+    return dados
+
 def check_jugadas_grandes(dados_elegidos:list,nro_tiro:int) -> list:
     '''
     Se ingresa el resultado de la tirada y el numero de tiro.
