@@ -11,11 +11,12 @@ dados_dic = {1:'       \n|       |\n|   *   |\n|       |\n       ',
 jugadas_grandes = {'escalera':20, 'full':30, 'poker':40, 'generala':50, 'generala_doble':100}
 
 class Jugador:
-    def __init__(self, nombre:str, puntaje=None) -> None:
+    def __init__(self, nombre:str, numero_partida, puntaje=None) -> None:
         self.nombre = nombre.lower()
         if puntaje is None:
             puntaje = [1,1,None,None,None,None,None,None,None,None,None,None,None,None]
         self.puntaje = puntaje
+        self.numero_partida = numero_partida
     def __str__(self) -> str:
         return f'{self.name}'
 
@@ -35,6 +36,9 @@ def tirada(dados_elegidos:list) -> list:
     return dados_elegidos
 
 def elegir_dados(dados_elegidos:list) -> list:
+    '''
+    Toma los dados resultantes de la tirada y retorna los dados que el jugador desea conservar para el siguiente tiro
+    '''
     dados= []
     print('Elige los dados que quieras guardar para el siguiente tiro...\n')
     for i in range(1, 6):
@@ -90,6 +94,48 @@ def menu_despues_de_tirada(dados_elegidos: list) -> list:
     for i,jug in enumerate(grandes, start=1):
         print(f'{i}- {jug}')
 
+def guardar_borrar_partida(idPartida):
+    '''
+    Da la opcion de guardar y cerrar la partida o eliminarla y salir.
+    '''
+    print("Ingrese:\n- 1 para GUARDAR la partida y SALIR.\n- 2 para BORRAR la partida y SALIR.")
+    ref_anotacion = {"1": 1, "2": 2}
+    opcion_continuar = input("\nIngrese la opción deseada: ")
+    while opcion_continuar not in ref_anotacion: # esta es la validacion para un ingreso erróneo
+        print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
+        opcion_continuar = int(input("Ingrese:\n- 1 para GUARDAR la partida y SALIR.\n- 2 para BORRAR la partida y SALIR."))
+    if opcion_continuar == 1: # Cierra la Base de Datos, cierra el juego y sale del programa
+        #funcionesbd.cerrarBase()
+        print("La partida ha sido guardada CORRECTAMENTE!")
+        print("Muchas gracias por jugar! Vuelva pronto!")
+        sys.exit()
+    elif opcion_continuar == 2: # pide la confirmacion para borrar la partida que ha jugado
+        ref_borrar = {"1": 1, "2": 2}
+        print("\nPor favor, confirme su eleccion.")
+        borrar = int(input("Presione -> 1 para BORRAR y SALIR\nPresione -> 2 para VOLVER ATRÁS: "))
+        while borrar not in ref_borrar: # validacion para un ingreso erróneo
+            print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
+            borrar = int(input("\nPresione -> 1 para BORRAR y SALIR\nPresione -> 2 para VOLVER ATRÁS: "))
+        if borrar == "1": # borra la partida y sale del programa
+            #funcionesbd.borrarPartida(idPartida)
+            print("Partida borrada CORRECTAMENTE!.\nMuchas gracias por jugar! Vuelva pronto!")
+            sys.exit()
+        elif borrar == "2": # vuelve a preguntar si desea continuar la partida
+            pregunta_continuar(idPartida)
+
+def pregunta_continuar(id_partida:int) -> bool:
+    '''
+    pregunta al usuario si desea continuar la partida o guardarla/borrarla
+    '''
+    print("Presione -> ENTER para CONTINUAR la partida.")
+    opcion = input("Presione -> 1 para GUARDAR y SALIR: ")
+    if opcion == "1": # esta opción lleva a otra función que amplía las opciones a guardar y salir, o borrar y salir.
+        print("")
+        guardar_borrar_partida(id_partida)
+    else: # esta opcion hace que la partida continúe
+        print("")
+        return True
+    
 def cerrarPartida():
     '''
     Cierra el programa cuando el usuario lo desea o si finaliza la partida.
@@ -112,10 +158,10 @@ def iniciarPrograma():
     opcionPartida = int(opcionPartida)
     if opcionPartida == 1: # invoca a la funcion de iniciar una partida nueva
         print("\nUsted a iniciado una NUEVA PARTIDA.\n")
-        nuevaPartida()
+        #nuevaPartida()
     elif opcionPartida == 2: # invoca a la función de reanudar una partida guardada
         print("")
-        reanudarPartida()
+        #reanudarPartida()
     elif opcionPartida == 3: # cerrar el programa y salir del juego
         print("Muchas gracias por jugar! Vuelva Pronto!")
         cerrarPartida()
