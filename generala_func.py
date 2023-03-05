@@ -10,6 +10,16 @@ dados_dic = {1:'       \n|       |\n|   *   |\n|       |\n       ',
             6:'       \n| *   * |\n| *   * |\n| *   * |\n       '}
 jugadas_grandes = {'escalera':20, 'full':30, 'poker':40, 'generala':50, 'generala_doble':100}
 
+class Jugador:
+    def __init__(self, nombre:str, puntaje=None) -> None:
+        self.nombre = nombre.lower()
+        if puntaje is None:
+            puntaje = [1,1,None,None,None,None,None,None,None,None,None,None,None,None]
+        self.puntaje = puntaje
+    def __str__(self) -> str:
+        return f'{self.name}'
+
+
 def tirada(dados_elegidos:list) -> list:
     '''
     Realiza la tirada de dados. Toma una lista (vacia o no) y retorna una lista de dados arrojados
