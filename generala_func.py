@@ -8,7 +8,8 @@ dados_dic = {1:'       \n|       |\n|   *   |\n|       |\n       ',
             4:'       \n| *   * |\n|       |\n| *   * |\n       ',
             5:'       \n| *   * |\n|   *   |\n| *   * |\n       ',
             6:'       \n| *   * |\n| *   * |\n| *   * |\n       '}
-jugadas_grandes = {'escalera':20, 'full':30, 'poker':40, 'generala':50, 'generala_doble':100}
+jugadas_grandes = {'escalera':20, 'full':30, 'poker':40, 'generala':50, 'generala doble':100}
+ubicacion_en_tablero = {'Numero de ronda':0,'Numero de tiro':1,'escalera':2, 'full':3, 'poker':4, 'generala':5, 'generala doble':6, '1':7, '2':8, '3':9, '4':10, '5':11, '6':12, 'total':13}
 
 class Jugador:
     def __init__(self, nombre:str, numero_partida, puntaje=None) -> None:
@@ -61,7 +62,6 @@ def elegir_dados(dados_elegidos:list) -> list:
         else:
             print('Por favor, ingrese la opción deseada: ')
 
-
 def check_jugadas_grandes(dados_elegidos:list,nro_tiro:int) -> list:
     '''
     Se ingresa el resultado de la tirada y el numero de tiro.
@@ -95,15 +95,25 @@ def check_jugadas_chicas(dados_elegidos:list) -> list:
             lista_jugadas_chicas.append(f'{v} al {k}')
     return lista_jugadas_chicas
 
-def menu_despues_de_tirada(dados_elegidos: list) -> list:
+def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int) -> list:
     '''
     Se ingresan los dados al fin del tiro y se muestra en pantalla todas las jugadas posibles
     '''
-    grandes = check_jugadas_grandes(dados_elegidos, 1)
+    grandes = check_jugadas_grandes(dados_elegidos, nro_tiro)
     chicas = check_jugadas_chicas(dados_elegidos)
     grandes.extend(chicas)
     for i,jug in enumerate(grandes, start=1):
         print(f'{i}- {jug}')
+    eleccion = input(f'\nPresione 1 para elegir una de las jugadas o 2 para seleccionar dados y volver a arrojar: ')
+    ref_anotacion = {"1": 1, "2": 2}
+    while eleccion not in ref_anotacion: # esta es la validacion para un ingreso erróneo
+        print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
+        eleccion = input('\nPresione 1 para elegir una de las jugadas o 2 para seleccionar dados y volver a arrojar: ')
+    if eleccion == '1':
+        #selecciona de las jugadas y planta
+    elif eleccion == '2':
+        elegir_dados(dados_elegidos)
+
 
 def guardar_borrar_partida(idPartida):
     '''
@@ -147,11 +157,23 @@ def pregunta_continuar(id_partida:int) -> bool:
         print("")
         return True
     
-def cerrarPartida():
+def cerrar_partida():
     '''
     Cierra el programa cuando el usuario lo desea o si finaliza la partida.
     '''
     sys.exit()
+
+def nueva_partida():
+    cant_jugadores = input('\nSeleccione la cantidad de jugadores: ')
+    while not cant_jugadores.isdigit() or int(cant_jugadores) > 10:
+        print('\nERROR! Lo ingresado no fue recibido correctamente.\nPor favor, ingrese una opción válida usando NÚMEROS.')
+        cant_jugadores = input('\nSeleccione la cantidad de jugadores: ')
+    JUGADORES = defaultdict(lambda: 'No existe dicho jugador')
+    numero_partida = 1 #recolectar de BD el numero
+    for i in range(1, cant_jugadores+1):
+        x = input(f'\nElige el nombre del jugador {i}')
+        JUGADORES[i] = Jugador(x,numero_partida)
+        
 
 def iniciarPrograma():
     '''
@@ -169,12 +191,10 @@ def iniciarPrograma():
     opcionPartida = int(opcionPartida)
     if opcionPartida == 1: # invoca a la funcion de iniciar una partida nueva
         print("\nUsted a iniciado una NUEVA PARTIDA.\n")
-        #nuevaPartida()
+        nueva_partida()
     elif opcionPartida == 2: # invoca a la función de reanudar una partida guardada
         print("")
         #reanudarPartida()
     elif opcionPartida == 3: # cerrar el programa y salir del juego
         print("Muchas gracias por jugar! Vuelva Pronto!")
-        cerrarPartida()
-
-print(elegir_dados([1,1,2,2,3]))
+        cerrar_partida()
