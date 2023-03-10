@@ -17,6 +17,7 @@ class Jugador:
             puntaje = [1,1,None,None,None,None,None,None,None,None,None,None,None,None]
         self.puntaje = puntaje
         self.numero_partida = numero_partida
+    
     def __str__(self) -> str:
         return f'{self.name}'
 
@@ -45,11 +46,21 @@ def elegir_dados(dados_elegidos:list) -> list:
         print(f'{i}: {dados_elegidos[i-1]}')
     
     eleccion = input('\nEscribe el numero de menu de los dados a elegir, sin comas ni espacios: ')
-    while not eleccion.isdigit():
+    valid = set('12345')
+    while not eleccion.isdigit() or not set(eleccion).issubset(valid):
+        print('Por favor, ingrese la opción deseada: ')
         eleccion = input('\nEscribe el numero de menu de los dados a elegir, sin comas ni espacios: ')
     for i in eleccion:
         dados.append(dados_elegidos[int(i)-1])
-    return dados
+    while True:
+        x = input(f'Sus dados son:\n{dados}\n\nPresione 1 para confirmar o 2 para volver a elegir: ')
+        if x == '1':
+            return dados
+        elif x == '2':
+            return elegir_dados(dados_elegidos)
+        else:
+            print('Por favor, ingrese la opción deseada: ')
+
 
 def check_jugadas_grandes(dados_elegidos:list,nro_tiro:int) -> list:
     '''
@@ -165,3 +176,5 @@ def iniciarPrograma():
     elif opcionPartida == 3: # cerrar el programa y salir del juego
         print("Muchas gracias por jugar! Vuelva Pronto!")
         cerrarPartida()
+
+print(elegir_dados([1,1,2,2,3]))
