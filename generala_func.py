@@ -62,7 +62,7 @@ def elegir_dados(dados_elegidos:list) -> list:
         else:
             print('Por favor, ingrese la opción deseada: ')
 
-def check_jugadas_grandes(dados_elegidos:list,nro_tiro:int) -> list:
+def check_jugadas_grandes(dados_elegidos:list,nro_tiro:int,jugador) -> list:
     '''
     Se ingresa el resultado de la tirada y el numero de tiro.
     Retorna una lista con las jugadas grandes del juego.
@@ -78,7 +78,7 @@ def check_jugadas_grandes(dados_elegidos:list,nro_tiro:int) -> list:
     if dados_elegidos[0] == dados_elegidos[4]:
         jugadas.append('generala')
         if nro_tiro == 1 and 'generala' in jugadas:
-            print('GENERALA SERVIDA!!!! Ganaste el juego!')
+            print(f'GENERALA SERVIDA!!!! {jugador.name}ha ganado el juego!')
             #agregar fin del juego en este momento?
     return jugadas
     
@@ -95,25 +95,37 @@ def check_jugadas_chicas(dados_elegidos:list) -> list:
             lista_jugadas_chicas.append(f'{v} al {k}')
     return lista_jugadas_chicas
 
-def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int) -> list:
+def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador) -> list:
     '''
     Se ingresan los dados al fin del tiro y se muestra en pantalla todas las jugadas posibles
     '''
-    grandes = check_jugadas_grandes(dados_elegidos, nro_tiro)
+    grandes = check_jugadas_grandes(dados_elegidos, nro_tiro,jugador)
     chicas = check_jugadas_chicas(dados_elegidos)
     grandes.extend(chicas)
     for i,jug in enumerate(grandes, start=1):
         print(f'{i}- {jug}')
-    eleccion = input(f'\nPresione 1 para elegir una de las jugadas o 2 para seleccionar dados y volver a arrojar: ')
+    eleccion = input(f'\nPresione 1 para elegir una de las jugadas y plantar o 2 para seleccionar dados y volver a arrojar: ')
     ref_anotacion = {"1": 1, "2": 2}
     while eleccion not in ref_anotacion: # esta es la validacion para un ingreso erróneo
         print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
         eleccion = input('\nPresione 1 para elegir una de las jugadas o 2 para seleccionar dados y volver a arrojar: ')
-    if eleccion == '1':
-        #selecciona de las jugadas y planta
+    if eleccion == '1': # Planta
+        eleccion_jugada = int(input('seleccione el numero que corresponde a la jugada que quiere plantar'))-1
+        while eleccion_jugada > len(grandes) or eleccion_jugada < 0: #esta es la validacion para un ingreso erróneo
+            print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
+            eleccion = int(input('seleccione el numero que corresponde a la jugada que quiere plantar'))
+        if grandes[eleccion] in jugadas_grandes:
+            if nro_tiro == 1:
+                jugador.puntaje[ubicacion_en_tablero[grandes[eleccion]]] = jugadas_grandes[grandes[eleccion]] + 5
+            else:
+                jugador.puntaje[ubicacion_en_tablero[grandes[eleccion]]] = jugadas_grandes[grandes[eleccion]]
+        else:
+            if grandes[eleccion][1:2].isspace():
+                jugador.puntaje[ubicacion_en_tablero[grandes[eleccion][-1:]]] = grandes[eleccion][0:1]
+            else:
+                jugador.puntaje[ubicacion_en_tablero[grandes[eleccion][-1:]]] = grandes[eleccion][0:2]
     elif eleccion == '2':
         elegir_dados(dados_elegidos)
-
 
 def guardar_borrar_partida(idPartida):
     '''
@@ -169,7 +181,7 @@ def nueva_partida():
         print('\nERROR! Lo ingresado no fue recibido correctamente.\nPor favor, ingrese una opción válida usando NÚMEROS.')
         cant_jugadores = input('\nSeleccione la cantidad de jugadores: ')
     JUGADORES = defaultdict(lambda: 'No existe dicho jugador')
-    numero_partida = 1 #recolectar de BD el numero
+    numero_partida = 1 #recolectar de BD el numero, puse 1 para probar
     for i in range(1, cant_jugadores+1):
         x = input(f'\nElige el nombre del jugador {i}')
         JUGADORES[i] = Jugador(x,numero_partida)
