@@ -113,30 +113,35 @@ def plantar(jugadas:list,jugador:object,nro_tiro:int) -> None:
             if nro_tiro == 1:
                 jugadas.puntaje[ubicacion_en_tablero[jugadas[eleccion]]] = jugadas_grandes[jugadas[eleccion]] + 5
                 jugador.puntaje[1] = 1
-                return
             else:
                 jugador.puntaje[ubicacion_en_tablero[jugadas[eleccion]]] = jugadas_grandes[jugadas[eleccion]]
                 jugador.puntaje[1] = 1
-                return
         else:
             if jugadas[eleccion][1:2].isspace():
                 jugador.puntaje[ubicacion_en_tablero[jugadas[eleccion][-1:]]] = jugadas[eleccion][0:1]
                 jugador.puntaje[1] = 1
-                return
             else:
                 jugador.puntaje[ubicacion_en_tablero[jugadas[eleccion][-1:]]] = jugadas[eleccion][0:2]
                 jugador.puntaje[1] = 1
-                return
 
 def tachar(jugador:object):
+    global ubicacion_en_tablero
     ubicacion_invertida_en_tablero = {0:'Numero de ronda',1:'Numero de tiro',2:'Escalera',3:'Full',4: 'Poker', 5:'Generala', 6:'Generala doble', 7:'1', 8:'2', 9:'3', 10:'4',11: '5', 12:'6',13: 'total'}
     tachables = []
-    print(f'\nPuede tachar las siguientes jugadas: ')
+    print(f'\nPuede tachar las siguientes jugadas: \n')
+    contador_menu = 1
     for i in range(2,13):
-        if jugador.puntaje[ubicacion_invertida_en_tablero[i]] is None:
+        if jugador.puntaje[i] is None:
             tachables.append(ubicacion_invertida_en_tablero[i])
-            print(f'{ubicacion_invertida_en_tablero[i]}')
-    #falta agregar input y la logica de cuando se tacha
+            print(f'{contador_menu}: {ubicacion_invertida_en_tablero[i]}')
+            contador_menu +=1
+    entrada = input(f'Escriba la jugada que quiere tachar de la lista de arriba: ').capitalize()
+    print(entrada)
+    while entrada not in tachables:
+        print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
+        entrada = input(f'Escriba la jugada que quiere tachar de la lista de mas arriba: ')
+    jugador.puntaje[ubicacion_en_tablero[entrada]] = 0
+    print(f'\nSe ha tachado la siguiente jugada: {entrada}')
 
 
 
@@ -158,7 +163,7 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> 
         if eleccion == '1': # Planta
             plantar(grandes, jugador, nro_tiro)        
         elif eleccion == '2': # Tacha
-            tachar()
+            tachar(jugador)
     else:
         eleccion = input(f'\nPresione 1 para elegir una de las jugadas y plantar o 2 para seleccionar dados y volver a arrojar: ')
         ref_anotacion = ["1","2"]
@@ -169,7 +174,8 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> 
             plantar(grandes, jugador, nro_tiro)        
         elif eleccion == '2':
             jugador.puntaje[1] += 1
-            elegir_dados(dados_elegidos)
+            menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos)),jugador.puntaje[1],jugador)
+
 
 
 def guardar_borrar_partida(idPartida):
@@ -177,27 +183,26 @@ def guardar_borrar_partida(idPartida):
     Da la opcion de guardar y cerrar la partida o eliminarla y salir.
     '''
     print("Ingrese:\n- 1 para GUARDAR la partida y SALIR.\n- 2 para BORRAR la partida y SALIR.")
-    ref_anotacion = {"1": 1, "2": 2}
+    ref_anotacion = ["1", "2"]
     opcion_continuar = input("\nIngrese la opción deseada: ")
     while opcion_continuar not in ref_anotacion: # esta es la validacion para un ingreso erróneo
         print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
-        opcion_continuar = int(input("Ingrese:\n- 1 para GUARDAR la partida y SALIR.\n- 2 para BORRAR la partida y SALIR."))
-    if opcion_continuar == 1: # Cierra la Base de Datos, cierra el juego y sale del programa
+        opcion_continuar = input("Ingrese:\n- 1 para GUARDAR la partida y SALIR.\n- 2 para BORRAR la partida y SALIR.")
+    if opcion_continuar == '1': # Cierra la Base de Datos, cierra el juego y sale del programa
         #funcionesbd.cerrarBase()
         print("La partida ha sido guardada CORRECTAMENTE!")
-        print("Muchas gracias por jugar! Vuelva pronto!")
-        sys.exit()
+        cerrar_partida()
     elif opcion_continuar == 2: # pide la confirmacion para borrar la partida que ha jugado
-        ref_borrar = {"1": 1, "2": 2}
+        ref_borrar = ["1", "2"]
         print("\nPor favor, confirme su eleccion.")
-        borrar = int(input("Presione -> 1 para BORRAR y SALIR\nPresione -> 2 para VOLVER ATRÁS: "))
+        borrar = input("Presione -> 1 para BORRAR y SALIR\nPresione -> 2 para VOLVER ATRÁS: ")
         while borrar not in ref_borrar: # validacion para un ingreso erróneo
             print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
             borrar = int(input("\nPresione -> 1 para BORRAR y SALIR\nPresione -> 2 para VOLVER ATRÁS: "))
         if borrar == "1": # borra la partida y sale del programa
             #funcionesbd.borrarPartida(idPartida)
-            print("Partida borrada CORRECTAMENTE!.\nMuchas gracias por jugar! Vuelva pronto!")
-            sys.exit()
+            print("Partida borrada CORRECTAMENTE!.")
+            cerrar_partida()
         elif borrar == "2": # vuelve a preguntar si desea continuar la partida
             pregunta_continuar(idPartida)
 
@@ -218,6 +223,8 @@ def cerrar_partida():
     '''
     Cierra el programa cuando el usuario lo desea o si finaliza la partida.
     '''
+    print("Muchas gracias por jugar! Vuelva pronto!")
+    input()
     sys.exit()
 
 def nueva_partida():
@@ -238,6 +245,8 @@ def nueva_partida():
             print(f'\nEs el turno del jugador #{numero}: {jugador.nombre}')
             dados_elegidos = tirada([])
             menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador)
+            if pregunta_continuar(numero_partida):
+                pass
 
         
 
