@@ -1,6 +1,7 @@
 import random
 from collections import defaultdict
 import sys
+import tabulate
 
 dados_dic = {1:'       \n|       |\n|   *   |\n|       |\n       ', 
             2:'       \n| *     |\n|       |\n|     * |\n       ',
@@ -104,14 +105,15 @@ def check_jugadas_chicas(dados_elegidos:list,jugador:object) -> list:
 def plantar(jugadas:list,jugador:object,nro_tiro:int) -> None:
         global jugadas_grandes
         global ubicacion_en_tablero
-        eleccion_jugada = int(input('seleccione el numero que corresponde a la jugada que quiere plantar'))-1
-        while eleccion_jugada > len(jugadas) or eleccion_jugada < 0: #esta es la validacion para un ingreso erróneo
+        eleccion = int(input('\nSeleccione el numero que corresponde a la jugada que quiere plantar: '))-1
+        while eleccion > len(jugadas) or eleccion < 0: #esta es la validacion para un ingreso erróneo
             print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
             eleccion = int(input('seleccione el numero que corresponde a la jugada que quiere plantar'))
         if jugadas[eleccion] in jugadas_grandes:
             if nro_tiro == 1:
                 jugadas.puntaje[ubicacion_en_tablero[jugadas[eleccion]]] = jugadas_grandes[jugadas[eleccion]] + 5
                 jugador.puntaje[1] = 1
+                
             else:
                 jugador.puntaje[ubicacion_en_tablero[jugadas[eleccion]]] = jugadas_grandes[jugadas[eleccion]]
                 jugador.puntaje[1] = 1
@@ -122,8 +124,12 @@ def plantar(jugadas:list,jugador:object,nro_tiro:int) -> None:
             else:
                 jugador.puntaje[ubicacion_en_tablero[jugadas[eleccion][-1:]]] = jugadas[eleccion][0:2]
                 jugador.puntaje[1] = 1
+        print(f'\nSe ha guardado la jugada {jugadas[eleccion]}\n')
 
-def tachar(jugador:object):
+def tachar(jugador:object) -> None:
+    '''
+    Se anula una de las posiciones en la tabla de puntajes
+    '''
     global ubicacion_en_tablero
     ubicacion_invertida_en_tablero = {0:'Numero de ronda',1:'Numero de tiro',2:'Escalera',3:'Full',4: 'Poker', 5:'Generala', 6:'Generala doble', 7:'1', 8:'2', 9:'3', 10:'4',11: '5', 12:'6',13: 'total'}
     tachables = []
@@ -135,7 +141,6 @@ def tachar(jugador:object):
             print(f'{contador_menu}: {ubicacion_invertida_en_tablero[i]}')
             contador_menu +=1
     entrada = input(f'Escriba la jugada que quiere tachar de la lista de arriba: ').capitalize()
-    print(entrada)
     while entrada not in tachables:
         print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
         entrada = input(f'Escriba la jugada que quiere tachar de la lista de mas arriba: ')
@@ -173,7 +178,7 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> 
             jugador.puntaje[1] += 1
             menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos)),jugador.puntaje[1],jugador)
 
-def guardar_borrar_partida(idPartida):
+def guardar_borrar_partida(idPartida) -> None:
     '''
     Da la opcion de guardar y cerrar la partida o eliminarla y salir.
     '''
@@ -222,6 +227,23 @@ def cerrar_partida():
     input()
     sys.exit()
 
+def sumar_puntajes(JUGADORES) -> None:
+    #chequear BD
+    puntajes_altos = []
+    orden_puntajes = []
+    for numero, jugador in JUGADORES.items():
+        count = sum(jugador.puntaje[2:-1])
+        jugador.puntaje[-1] = count
+        if count > min(puntajes_altos):
+            puntajes_altos.append((jugador.name, count))
+            #guardar en bd
+        orden_puntajes.append((jugador.nombre,count))
+    tabla = sorted(orden_puntajes, key=lambda x: x[1], reverse=True)
+    tablero = tabulate(tabla, headers=["Nombre", "Puntaje"])
+    print(tablero)
+    print(f'\n*** El jugador {tabla[0][0]} ha ganado la partida. FELICITACIONES!!! ***')
+
+
 def nueva_partida():
     cant_jugadores = input('\nSeleccione la cantidad de jugadores: ')
     while not cant_jugadores.isdigit() or int(cant_jugadores) > 10:
@@ -242,9 +264,15 @@ def nueva_partida():
             jugador.puntaje[0] += 1
             if pregunta_continuar(numero_partida):
                 pass
+    sumar_puntajes(JUGADORES)
+    volver_a_jugar = input(f'\nDesea volver a jugar?\nPresione 1 para volver a jugar o ENTER para finalizar\n')
+    if volver_a_jugar == '1':
+        nueva_partida()
+    else:
+        cerrar_partida()
 
+    
         
-
 def iniciarPrograma():
     '''
     La funcion que general que inicia todo el juego
