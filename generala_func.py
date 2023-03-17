@@ -13,7 +13,7 @@ ubicacion_en_tablero = {'Numero de ronda':0,'Numero de tiro':1,'Escalera':2, 'Fu
 
 class Jugador:
     def __init__(self, nombre:str, numero_partida, puntaje=None) -> None:
-        self.nombre = nombre.lower()
+        self.nombre = nombre.capitalize()
         if puntaje is None:
             puntaje = [1,1,None,None,None,None,None,None,None,None,None,None,None,None]
         self.puntaje = puntaje
@@ -21,7 +21,6 @@ class Jugador:
     
     def __str__(self) -> str:
         return f'{self.nombre}'
-
 
 def tirada(dados_elegidos:list) -> list:
     '''
@@ -143,8 +142,6 @@ def tachar(jugador:object):
     jugador.puntaje[ubicacion_en_tablero[entrada]] = 0
     print(f'\nSe ha tachado la siguiente jugada: {entrada}')
 
-
-
 def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> list:
     '''
     Se ingresan los dados al fin del tiro y se muestran las opciones disponibles
@@ -175,8 +172,6 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> 
         elif eleccion == '2':
             jugador.puntaje[1] += 1
             menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos)),jugador.puntaje[1],jugador)
-
-
 
 def guardar_borrar_partida(idPartida):
     '''
@@ -237,7 +232,6 @@ def nueva_partida():
     for i in range(1, int(cant_jugadores)+1):
         x = input(f'\nElige el nombre del jugador {i}: ')
         JUGADORES[i] = Jugador(x,numero_partida)
-    print(JUGADORES)
         #Guardar jugadores en BD
     for turno in range(1,12):
         print(f'\n*** Ronda numero {turno} ***\n')
@@ -245,6 +239,7 @@ def nueva_partida():
             print(f'\nEs el turno del jugador #{numero}: {jugador.nombre}')
             dados_elegidos = tirada([])
             menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador)
+            jugador.puntaje[0] += 1
             if pregunta_continuar(numero_partida):
                 pass
 
