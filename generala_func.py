@@ -157,6 +157,9 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> 
     for i,jug in enumerate(grandes, start=1):
         print(f'{i}- {jug}')
     if nro_tiro == 3:
+        if len(grandes) == 0:
+            tachar(jugador)
+            return
         eleccion = input(f'\nPresione 1 para plantar o 2 para tachar una jugada: ')
         ref_anotacion = ["1","2"]
         while eleccion not in ref_anotacion: # esta es la validacion para un ingreso erróneo
@@ -167,7 +170,10 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> 
         elif eleccion == '2': # Tacha
             tachar(jugador)
     else:
-        eleccion = input(f'\nPresione 1 para elegir una de las jugadas y plantar o 2 para seleccionar dados y volver a arrojar: ')
+        if len(grandes) == 0:
+            eleccion = input(f'\nPresione 2 para seleccionar dados y volver a arrojar: ')
+        else:
+            eleccion = input(f'\nPresione 1 para elegir una de las jugadas y plantar o 2 para seleccionar dados y volver a arrojar: ')
         ref_anotacion = ["1","2"]
         while eleccion not in ref_anotacion: # esta es la validacion para un ingreso erróneo
             print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
@@ -178,7 +184,7 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> 
             jugador.puntaje[1] += 1
             menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos)),jugador.puntaje[1],jugador)
 
-def guardar_borrar_partida(idPartida) -> None:
+def guardar_borrar_partida(idPartida: int) -> None:
     '''
     Da la opcion de guardar y cerrar la partida o eliminarla y salir.
     '''
@@ -271,7 +277,15 @@ def nueva_partida():
     else:
         cerrar_partida()
 
-    
+def reanudar_partida(id_partida:int):
+    JUGADORES = 'jugadores de la BD de esa partida'
+    for _,jugador in JUGADORES.items():
+        print(f'\nJugador #{_}: {jugador.nombre}\nPuntaje parcial:\n')
+        headers = ['# Turno', '# Tiro', 'Escalera', 'Full', 'Poker', 'Generala', 'Generala doble', '1', '2', '3', '4', '5', '6']
+        print(tabulate(jugador.puntaje[:-1], headers=headers, tablefmt="rst"))
+        #ver de poner todos los puntajes juntos.
+        #continuar los tiros desde donde lo dejamos.
+
         
 def iniciarPrograma():
     '''
@@ -287,11 +301,12 @@ def iniciarPrograma():
         print("- 1 para iniciar una nueva partida.\n- 2 para reanudar una partida guardada.\n- 3 para CERRAR el programa.")
         opcion_partida = input("\nPor favor, ingrese la opción deseada: ")
     if opcion_partida == '1': # invoca a la funcion de iniciar una partida nueva
-        print("\nUsted a iniciado una NUEVA PARTIDA.\n")
+        print("\nUsted ha iniciado una NUEVA PARTIDA.\n")
         nueva_partida()
-    elif opcion_partida == '2': # invoca a la función de reanudar una partida guardada
-        print("")
-        #reanudar_partida()
+    elif opcion_partida == '2': # invoca a la función de reanudar la ultima partida guardada
+        print("\nUsted ha elegido reanudar la ultima partida.\n")
+        id_partida = 'ULTIMA PARTIDA EN BD'
+        reanudar_partida(id_partida)
     elif opcion_partida == '3': # cerrar el programa y salir del juego
         print("Muchas gracias por jugar! Vuelva Pronto!")
         cerrar_partida()
