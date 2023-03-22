@@ -292,9 +292,9 @@ def iniciarPrograma():
     La funcion que general que inicia todo el juego
     '''
     print(">>> BIENVENIDO A LA GENERALA! <<<")
-    print("Desea iniciar una partida nueva?\nIngrese:\n- 1 para iniciar una NUEVA partida.\n- 2 para REANUDAR la ultima partida guardada.")
-    print("- 3 para CERRAR el programa.")
-    ref_anotacion = ['1','2','3']
+    print("Desea iniciar una partida nueva?\nIngrese:\n- 1 para iniciar una NUEVA partida.\n- 2 para REANUDAR la ultima partida guardada.\n- 3 para ver PUNTAJES MAS ALTOS")
+    print("- 4 para CERRAR el programa.")
+    ref_anotacion = ['1','2','3','4']
     opcion_partida = input("\nIngrese la opción deseada: ")
     while opcion_partida not in ref_anotacion: # Esta es la validacion para un ingreso erróneo
         print("\n*** ERROR! Lo ingresado no fue recibido correctamente.\nPor favor, ingrese una opción válida usando NÚMEROS.")
@@ -307,6 +307,10 @@ def iniciarPrograma():
         print("\nUsted ha elegido reanudar la ultima partida.\n")
         id_partida = 'ULTIMA PARTIDA EN BD'
         reanudar_partida(id_partida)
-    elif opcion_partida == '3': # cerrar el programa y salir del juego
+    elif opcion_partida == '3': # Mejores puntajes
+        #consultar BD por puntajes mas altos
+        puntajes_altos = []
+        print(tabulate(puntajes_altos, headers=['Nombre','Puntaje'], tablefmt='simple'))
+    elif opcion_partida == '4': # cerrar el programa y salir del juego
         print("Muchas gracias por jugar! Vuelva Pronto!")
         cerrar_partida()
