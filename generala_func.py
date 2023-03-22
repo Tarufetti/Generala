@@ -28,7 +28,7 @@ def tirada(dados_elegidos:list) -> list:
     Realiza la tirada de dados. Toma una lista (vacia o no) y retorna una lista de dados arrojados
     '''
     dados_tirados = []
-    _ = input('Presione una tecla para arrojar los dados: ')
+    _ = input('Presione ENTER para arrojar los dados: ')
     for _ in range((5-len(dados_elegidos))):
         dados_tirados.append(random.randint(1,6))
     dados_elegidos.extend(dados_tirados)
@@ -145,7 +145,8 @@ def tachar(jugador:object) -> None:
         print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
         entrada = input(f'Escriba la jugada que quiere tachar de la lista de mas arriba: ')
     jugador.puntaje[ubicacion_en_tablero[entrada]] = 0
-    print(f'\nSe ha tachado la siguiente jugada: {entrada}')
+    jugador.puntaje[1] = 1
+    print(f'\nSe ha tachado la siguiente jugada: {ubicacion_invertida_en_tablero[entrada]}')
 
 def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> list:
     '''
@@ -277,14 +278,28 @@ def nueva_partida():
     else:
         cerrar_partida()
 
-def reanudar_partida(id_partida:int):
-    JUGADORES = 'jugadores de la BD de esa partida'
+def reanudar_partida(numero_partida:int):
+    JUGADORES = 'jugadores de la BD de esa partida' #Iterar para crear instancias de la clase jugador
     for _,jugador in JUGADORES.items():
         print(f'\nJugador #{_}: {jugador.nombre}\nPuntaje parcial:\n')
         headers = ['# Turno', '# Tiro', 'Escalera', 'Full', 'Poker', 'Generala', 'Generala doble', '1', '2', '3', '4', '5', '6']
         print(tabulate(jugador.puntaje[:-1], headers=headers, tablefmt="rst"))
-        #ver de poner todos los puntajes juntos.
-        #continuar los tiros desde donde lo dejamos.
+    ronda = JUGADORES[1].puntaje[0]
+    for turno in range(ronda,12):
+        print(f'\n*** Ronda numero {turno} ***\n')
+        for numero, jugador in JUGADORES.items():
+            print(f'\nEs el turno del jugador #{numero}: {jugador.nombre}')
+            dados_elegidos = tirada([])
+            menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador)
+            jugador.puntaje[0] += 1
+            if pregunta_continuar(numero_partida):
+                pass
+    sumar_puntajes(JUGADORES)
+    volver_a_jugar = input(f'\nDesea volver a jugar?\nPresione 1 para volver a jugar o ENTER para finalizar\n')
+    if volver_a_jugar == '1':
+        nueva_partida()
+    else:
+        cerrar_partida()
 
         
 def iniciarPrograma():
@@ -310,6 +325,7 @@ def iniciarPrograma():
     elif opcion_partida == '3': # Mejores puntajes
         #consultar BD por puntajes mas altos
         puntajes_altos = []
+        print('\n*** Mejores Puntajes ***\n')
         print(tabulate(puntajes_altos, headers=['Nombre','Puntaje'], tablefmt='simple'))
     elif opcion_partida == '4': # cerrar el programa y salir del juego
         print("Muchas gracias por jugar! Vuelva Pronto!")
