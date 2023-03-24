@@ -21,7 +21,7 @@ class Jugador:
         self.numero_partida = numero_partida
     
     def __str__(self) -> str:
-        return f'{self.nombre}'
+        return f'{self.nombre}\nPuntaje: {self.puntaje}\n'
 
 def tirada(dados_elegidos:list) -> list:
     '''
@@ -195,7 +195,7 @@ def guardar_borrar_partida(idPartida: int) -> None:
     while opcion_continuar not in ref_anotacion: # esta es la validacion para un ingreso erróneo
         print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
         opcion_continuar = input("Ingrese:\n- 1 para GUARDAR la partida y SALIR.\n- 2 para BORRAR la partida y SALIR.")
-    if opcion_continuar == '1': # Cierra la Base de Datos, cierra el juego y sale del programa
+    if opcion_continuar == '1': # Guarda en la Base de Datos, la cierra y cierra el juego y sale del programa
         #funcionesbd.cerrarBase()
         print("La partida ha sido guardada CORRECTAMENTE!")
         cerrar_partida()
@@ -236,14 +236,11 @@ def cerrar_partida():
 
 def sumar_puntajes(JUGADORES) -> None:
     #chequear BD
-    puntajes_altos = []
     orden_puntajes = []
     for numero, jugador in JUGADORES.items():
         count = sum(jugador.puntaje[2:-1])
         jugador.puntaje[-1] = count
-        if count > min(puntajes_altos):
-            puntajes_altos.append((jugador.name, count))
-            #guardar en bd
+        #guardar puntajes
         orden_puntajes.append((jugador.nombre,count))
     tabla = sorted(orden_puntajes, key=lambda x: x[1], reverse=True)
     tablero = tabulate(tabla, headers=["Nombre", "Puntaje"])
@@ -261,7 +258,6 @@ def nueva_partida():
     for i in range(1, int(cant_jugadores)+1):
         x = input(f'\nElige el nombre del jugador {i}: ')
         JUGADORES[i] = Jugador(x,numero_partida)
-        #Guardar jugadores en BD
     for turno in range(1,12):
         print(f'\n*** Ronda numero {turno} ***\n')
         for numero, jugador in JUGADORES.items():
@@ -269,8 +265,8 @@ def nueva_partida():
             dados_elegidos = tirada([])
             menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador)
             jugador.puntaje[0] += 1
-            if pregunta_continuar(numero_partida):
-                pass
+        if pregunta_continuar(numero_partida):
+            pass
     sumar_puntajes(JUGADORES)
     volver_a_jugar = input(f'\nDesea volver a jugar?\nPresione 1 para volver a jugar o ENTER para finalizar\n')
     if volver_a_jugar == '1':
@@ -279,7 +275,8 @@ def nueva_partida():
         cerrar_partida()
 
 def reanudar_partida(numero_partida:int):
-    JUGADORES = 'jugadores de la BD de esa partida' #Iterar para crear instancias de la clase jugador
+    llamado_BD = 'jugadores de la BD de esa partida' #Iterar para crear instancias de la clase jugador
+    JUGADORES = defaultdict(lambda: 'No existe dicho jugador')
     for _,jugador in JUGADORES.items():
         print(f'\nJugador #{_}: {jugador.nombre}\nPuntaje parcial:\n')
         headers = ['# Turno', '# Tiro', 'Escalera', 'Full', 'Poker', 'Generala', 'Generala doble', '1', '2', '3', '4', '5', '6']
