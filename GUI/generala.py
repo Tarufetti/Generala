@@ -24,15 +24,16 @@ frame_izq = ctk.CTkFrame(master=root, width=170)
 frame_izq.grid(row=0, column=0, rowspan=4, sticky="nsew")
 
 #Creacion del cuadro de entrada y boton submit principal
-entry = ctk.CTkEntry(root)
+entrada = ctk.StringVar()
+entry = ctk.CTkEntry(root, textvariable=None)
 entry.grid(row=3, column=1, columnspan=6, padx=(20, 0), pady=(20, 20), sticky="nsew")
-boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='dissabled')
+boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='dissabled', command=lambda: funciones.submit(entrada,entry))
 boton_submit.grid(row=3, column=7, padx=(20, 20), pady=(20, 20), sticky="nsew")
 
 #Consulta a la BBDD por el numero de la ultima partida
 numero_partida = 1
 
-#Creacion de las imagenes
+#Creacion de las imagenes de dados
 dice = []
 dice_relx = 0.20 # incrementa de a 0.15 para mantener simetria
 dice_rely = 0.15
@@ -49,10 +50,12 @@ for i in range(1,6):
     checkbox = ctk.CTkCheckBox(root, text=f'{i}')
     checkboxes.append(checkbox)
 
+#label de bienvenido al juego
 bienvenido = ctk.CTkLabel(root, text='Bienvenido a la Generala!', font=('roboto',60, 'bold'))
 bienvenido.place(relx= 0.20, rely=0.10)
 
-boton_n_partida = ctk.CTkButton(root, width=200, height=60, text='Nueva Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.nueva_partida(entry))
+#botones de la pantalla inicial
+boton_n_partida = ctk.CTkButton(root, width=200, height=60, text='Nueva Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos))
 boton_n_partida.place(relx= 0.48, rely=0.30)
 boton_r_partida = ctk.CTkButton(root, width=200, height=60, text='Reanudar Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.reanudar_partida(numero_partida))
 boton_r_partida.place(relx= 0.48, rely=0.45)

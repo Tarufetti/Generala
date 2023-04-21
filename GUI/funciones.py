@@ -1,15 +1,33 @@
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
+from collections import defaultdict
 
-def nueva_partida(entry):
+def submit(entrada, entry):
+    entrada.set(entry.get())
+
+def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos):
     '''
     Comienza nueva partida.
     '''
+    #modifica la pantalla principal
+    boton_n_partida.place_forget()
+    boton_r_partida.place_forget()
+    boton_puntajes_altos.place_forget()
+    boton_submit.configure(text='Enter!', fg_color='blue',state='normal')
+    
+    #comienza la ejecucion del juego
+    seleccion_jugadores = ctk.CTkLabel(master=root, text='Selecciona la cantidad de jugadores: ', font=('roboto',24))
+    seleccion_jugadores.place(relx=0.20, rely=0.30)
+    boton_submit.wait_variable(entrada)
     cant_jugadores = entry.get()
-    while not cant_jugadores.isdigit() or int(cant_jugadores) > 10:
+    if not cant_jugadores.isdigit() or int(cant_jugadores) > 10:
         CTkMessagebox(title='Generala', icon = 'cancel', message = 'Seleccione la cantidad de jugadores (1-10) usando NUMEROS', option_1 = 'OK', button_color='blue')
     JUGADORES = defaultdict(lambda: 'No existe dicho jugador')
     numero_partida = 1#recolectar de BD el numero, puse 1 para probar
+    
+    
+    #******* modificar a partir de aca ******
+    
     for i in range(1, int(cant_jugadores)+1):
         x = input(f'\nElige el nombre del jugador {i}: ')
         JUGADORES[i] = Jugador(x,numero_partida)
