@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import CTkMessagebox
+from CTkMessagebox import CTkMessagebox
 from PIL import Image
 import os
 import funciones
@@ -52,7 +52,7 @@ for i in range(1,6):
 bienvenido = ctk.CTkLabel(root, text='Bienvenido a la Generala!', font=('roboto',60, 'bold'))
 bienvenido.place(relx= 0.20, rely=0.10)
 
-boton_n_partida = ctk.CTkButton(root, width=200, height=60, text='Nueva Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.nueva_partida())
+boton_n_partida = ctk.CTkButton(root, width=200, height=60, text='Nueva Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.nueva_partida(entry))
 boton_n_partida.place(relx= 0.48, rely=0.30)
 boton_r_partida = ctk.CTkButton(root, width=200, height=60, text='Reanudar Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.reanudar_partida(numero_partida))
 boton_r_partida.place(relx= 0.48, rely=0.45)

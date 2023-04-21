@@ -1,14 +1,13 @@
 import customtkinter as ctk
+from CTkMessagebox import CTkMessagebox
 
-
-def nueva_partida():
+def nueva_partida(entry):
     '''
     Comienza nueva partida.
     '''
-    cant_jugadores = input('\nSeleccione la cantidad de jugadores: ')
+    cant_jugadores = entry.get()
     while not cant_jugadores.isdigit() or int(cant_jugadores) > 10:
-        print('\nERROR! Lo ingresado no fue recibido correctamente.\nPor favor, ingrese una opción válida usando NÚMEROS.')
-        cant_jugadores = input('\nSeleccione la cantidad de jugadores: ')
+        CTkMessagebox(title='Generala', icon = 'cancel', message = 'Seleccione la cantidad de jugadores (1-10) usando NUMEROS', option_1 = 'OK', button_color='blue')
     JUGADORES = defaultdict(lambda: 'No existe dicho jugador')
     numero_partida = 1#recolectar de BD el numero, puse 1 para probar
     for i in range(1, int(cant_jugadores)+1):
