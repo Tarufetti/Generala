@@ -2,7 +2,22 @@ import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
 from collections import defaultdict
 
-def submit(entrada, entry):
+#Creacion de la clase Jugador
+class Jugador:
+    def __init__(self, nombre:str, numero_partida, puntaje=None) -> None:
+        self.nombre = nombre.capitalize()
+        if puntaje is None:
+            puntaje = [1,1,None,None,None,None,None,None,None,None,None,None,None,None]
+        self.puntaje = puntaje
+        self.numero_partida = numero_partida
+    
+    def __str__(self) -> str:
+        return f'{self.nombre}\nPuntaje: {self.puntaje}\n'
+    
+def submit(entrada, entry):#El uso principal es para poder implementar el wait_variable mas adelante
+    '''
+    Al presionar el boton Submit, entrada se modifica.
+    '''
     entrada.set(entry.get())
 
 def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos):
@@ -25,12 +40,13 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     JUGADORES = defaultdict(lambda: 'No existe dicho jugador')
     numero_partida = 1#recolectar de BD el numero, puse 1 para probar
     
-    
-    #******* modificar a partir de aca ******
-    
+
     for i in range(1, int(cant_jugadores)+1):
-        x = input(f'\nElige el nombre del jugador {i}: ')
-        JUGADORES[i] = Jugador(x,numero_partida)
+        seleccion_jugadores.configure(text=f'Elige el nombre del jugador {i}:')
+        boton_submit.wait_variable(entrada) #Hacer que el codigo espere a que se presione boton de submit
+        x = entry.get()
+        JUGADORES[i] = Jugador(x,numero_partida) #Se crea una instancia de la clase Jugador con el nombre que se escribio previamente
+        print(JUGADORES[i])
     for turno in range(1,12):
         print(f'\n*** Ronda numero {turno} ***\n')
         for numero, jugador in JUGADORES.items():
@@ -73,6 +89,18 @@ def reanudar_partida(numero_partida:int):
         nueva_partida()
     else:
         cerrar_partida()
+
+def cerrar_programa(root):
+    '''
+    Crea una alerta al intentar cerrar el programa, pide confirmacion para cerrar.
+    '''
+    mensaje = CTkMessagebox(title="Exit?", message="Quieres cerrar el programa?",
+                        icon="question", option_1="Cancelar", option_2="Cerrar")
+    respuesta = mensaje.get()
+    if respuesta=="Cerrar":
+        root.destroy()
+    elif respuesta == 'Cancelar':
+        return
 
 def puntajes_altos(root,bienvenido, boton_n_partida, boton_r_partida, boton_puntajes_altos):
     '''

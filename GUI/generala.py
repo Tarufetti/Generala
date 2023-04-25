@@ -4,6 +4,7 @@ from PIL import Image
 import os
 import funciones
 
+
 #Creacion del cuadro principal de la GUI
 root = ctk.CTk()
 root.title('Generala')
@@ -11,6 +12,7 @@ cwd = os.getcwd()
 root.iconbitmap(f'{cwd}\\resources\\icono.ico')
 root.geometry('950x600')
 root.resizable(False,False)
+root.protocol("WM_DELETE_WINDOW", lambda: funciones.cerrar_programa(root))
 ctk.set_appearance_mode('system')
 
 
@@ -25,9 +27,9 @@ frame_izq.grid(row=0, column=0, rowspan=4, sticky="nsew")
 
 #Creacion del cuadro de entrada y boton submit principal
 entrada = ctk.StringVar()
-entry = ctk.CTkEntry(root, textvariable=None)
+entry = ctk.CTkEntry(root)
 entry.grid(row=3, column=1, columnspan=6, padx=(20, 0), pady=(20, 20), sticky="nsew")
-boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='dissabled', command=lambda: funciones.submit(entrada,entry))
+boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='dissabled', command=lambda: funciones.submit(entrada, entry))
 boton_submit.grid(row=3, column=7, padx=(20, 20), pady=(20, 20), sticky="nsew")
 
 #Consulta a la BBDD por el numero de la ultima partida
@@ -55,7 +57,7 @@ bienvenido = ctk.CTkLabel(root, text='Bienvenido a la Generala!', font=('roboto'
 bienvenido.place(relx= 0.20, rely=0.10)
 
 #botones de la pantalla inicial
-boton_n_partida = ctk.CTkButton(root, width=200, height=60, text='Nueva Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos))
+boton_n_partida = ctk.CTkButton(root, width=200, height=60, text='Nueva Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.nueva_partida(*args))
 boton_n_partida.place(relx= 0.48, rely=0.30)
 boton_r_partida = ctk.CTkButton(root, width=200, height=60, text='Reanudar Partida', font=('roboto', 20), fg_color='blue', command=lambda: funciones.reanudar_partida(numero_partida))
 boton_r_partida.place(relx= 0.48, rely=0.45)
@@ -69,5 +71,6 @@ boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
 
 
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos]
 if __name__ == '__main__':
     root.mainloop()
