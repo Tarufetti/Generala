@@ -71,6 +71,5 @@ boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
 
 
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos]
 if __name__ == '__main__':
     root.mainloop()
