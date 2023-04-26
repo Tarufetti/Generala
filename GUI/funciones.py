@@ -31,8 +31,8 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     boton_submit.configure(text='Enter!', fg_color='blue',state='normal')
     
     #comienza la ejecucion del juego
-    seleccion_jugadores = ctk.CTkLabel(master=root, text='Selecciona la cantidad de jugadores: ', font=('roboto',24))
-    seleccion_jugadores.place(relx=0.20, rely=0.30)
+    label = ctk.CTkLabel(master=root, text='Selecciona la cantidad de jugadores: ', font=('roboto',24))
+    label.place(relx=0.20, rely=0.30)
     boton_submit.wait_variable(entrada)
     cant_jugadores = entry.get()
     if not cant_jugadores.isdigit() or int(cant_jugadores) > 10:
@@ -42,15 +42,15 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     
 
     for i in range(1, int(cant_jugadores)+1):
-        seleccion_jugadores.configure(text=f'Elige el nombre del jugador {i}:')
+        label.configure(text=f'Elige el nombre del jugador {i}:')
         boton_submit.wait_variable(entrada) #Hacer que el codigo espere a que se presione boton de submit
         x = entry.get()
         JUGADORES[i] = Jugador(x,numero_partida) #Se crea una instancia de la clase Jugador con el nombre que se escribio previamente
         print(JUGADORES[i])
     for turno in range(1,12):
-        print(f'\n*** Ronda numero {turno} ***\n')
+        label.configure(text=f'*** Ronda numero {turno} ***')
         for numero, jugador in JUGADORES.items():
-            print(f'\nEs el turno del jugador #{numero}: {jugador.nombre}')
+            label2 = ctk.CTkLabel(master=root, text=f'\nEs el turno del jugador #{numero}: {jugador.nombre}')
             dados_elegidos = tirada([])
             menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador)
             jugador.puntaje[0] += 1
