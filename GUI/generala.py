@@ -4,13 +4,17 @@ from PIL import Image
 import os
 import funciones
 
+## CHEQUEAR EL TEMA DEL CIERRE DE LA APLICACION CUANDO SE ESTA EJECUTANDO UNA FUNCION
+## usando sys.exit por ahora
+## CHEQUEAR AFTER SCRIPTS cuando se cierra la app
+
 
 #Creacion del cuadro principal de la GUI
 root = ctk.CTk()
 root.title('Generala')
 cwd = os.getcwd()
 root.iconbitmap(f'{cwd}\\resources\\icono.ico')
-root.geometry('950x600')
+root.geometry('1120x600')
 root.resizable(False,False)
 root.protocol("WM_DELETE_WINDOW", lambda: funciones.cerrar_programa(root))
 ctk.set_appearance_mode('system')
@@ -23,12 +27,13 @@ root.grid_rowconfigure((0, 1, 2), weight=1)
 
 #Creacion de los cuadros interiores de la GUI
 frame_izq = ctk.CTkFrame(master=root, width=170)
-frame_izq.grid(row=0, column=0, rowspan=4, sticky="nsew")
+label_ronda_frameizq = ctk.CTkLabel(master=frame_izq, width=60, text=f'Ronda #')
+frame_der = ctk.CTkFrame(master=root, width=170)
 
 #Creacion del cuadro de entrada y boton submit principal
 entrada = ctk.StringVar()
-entry = ctk.CTkEntry(root)
-entry.grid(row=3, column=1, columnspan=6, padx=(20, 0), pady=(20, 20), sticky="nsew")
+entry = ctk.CTkEntry(root, width=750)
+entry.grid(row=3, column=1, columnspan=6, padx=(20, 0), pady=(20, 20), sticky="e")
 boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='dissabled', command=lambda: funciones.submit(entrada, entry))
 boton_submit.grid(row=3, column=7, padx=(20, 20), pady=(20, 20), sticky="nsew")
 
@@ -71,6 +76,6 @@ boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
 
 
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos]
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, frame_der]
 if __name__ == '__main__':
     root.mainloop()

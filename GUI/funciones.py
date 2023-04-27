@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
 from collections import defaultdict
+import sys
 
 #Creacion de la clase Jugador
 class Jugador:
@@ -20,7 +21,21 @@ def submit(entrada, entry):#El uso principal es para poder implementar el wait_v
     '''
     entrada.set(entry.get())
 
-def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos):
+def tirada(dados_elegidos:list) -> list:
+    '''
+    Realiza la tirada de dados. Toma una lista (vacia o no) y retorna una lista de dados arrojados
+    '''
+    dados_tirados = []
+    _ = input('Presione ENTER para arrojar los dados: ')
+    for _ in range((5-len(dados_elegidos))):
+        dados_tirados.append(random.randint(1,6))
+    dados_elegidos.extend(dados_tirados)
+    dados_elegidos.sort()
+    print(dados_elegidos)
+    print(dados_dic[dados_elegidos[0]],dados_dic[dados_elegidos[1]],dados_dic[dados_elegidos[2]],dados_dic[dados_elegidos[3]],dados_dic[dados_elegidos[4]])
+    return dados_elegidos
+
+def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, frame_der):
     '''
     Comienza nueva partida.
     '''
@@ -35,22 +50,34 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     label.place(relx=0.20, rely=0.30)
     boton_submit.wait_variable(entrada)
     cant_jugadores = entry.get()
-    if not cant_jugadores.isdigit() or int(cant_jugadores) > 10:
+    while not cant_jugadores.isdigit() or int(cant_jugadores) > 10 or int(cant_jugadores) < 1: #Validacion de entrada y cantidad de jugadores
         CTkMessagebox(title='Generala', icon = 'cancel', message = 'Seleccione la cantidad de jugadores (1-10) usando NUMEROS', option_1 = 'OK', button_color='blue')
+        boton_submit.wait_variable(entrada)
+        cant_jugadores = entry.get()
     JUGADORES = defaultdict(lambda: 'No existe dicho jugador')
     numero_partida = 1#recolectar de BD el numero, puse 1 para probar
-    
+    entry.delete(0, ctk.END) #Reinicia el texto del entry box
 
-    for i in range(1, int(cant_jugadores)+1):
+    for i in range(1, int(cant_jugadores)+1): #Seleccion de los nombres de los jugadores
         label.configure(text=f'Elige el nombre del jugador {i}:')
         boton_submit.wait_variable(entrada) #Hacer que el codigo espere a que se presione boton de submit
         x = entry.get()
+        while not x.isalpha(): #Validacion de entrada y cantidad de jugadores
+            CTkMessagebox(title='Generala', icon = 'cancel', message = 'Seleccione el nombre del jugador utilizando solo LETRAS', option_1 = 'OK', button_color='blue')
+            boton_submit.wait_variable(entrada)
+            x = entry.get()
         JUGADORES[i] = Jugador(x,numero_partida) #Se crea una instancia de la clase Jugador con el nombre que se escribio previamente
-        print(JUGADORES[i])
+        entry.delete(0, ctk.END)
+    frame_izq.grid(row=0, column=0, rowspan=4, sticky="nsew")
+    frame_der.grid(row=0, column=8, rowspan=4, sticky="nsew")
+    boton_submit.configure(text='Tirar!', fg_color='red', border_color='#cc0000')
+
     for turno in range(1,12):
-        label.configure(text=f'*** Ronda numero {turno} ***')
+        label_ronda_frameizq.configure(text=f'Ronda numero {turno}')
+
         for numero, jugador in JUGADORES.items():
-            label2 = ctk.CTkLabel(master=root, text=f'\nEs el turno del jugador #{numero}: {jugador.nombre}')
+            label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
+            boton_submit.wait_variable(entrada)
             dados_elegidos = tirada([])
             menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador)
             jugador.puntaje[0] += 1
@@ -99,6 +126,7 @@ def cerrar_programa(root):
     respuesta = mensaje.get()
     if respuesta=="Cerrar":
         root.destroy()
+        sys.exit()
     elif respuesta == 'Cancelar':
         return
 
