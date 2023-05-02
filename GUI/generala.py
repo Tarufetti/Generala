@@ -5,9 +5,10 @@ import os
 import funciones
 
 ## CHEQUEAR EL TEMA DEL CIERRE DE LA APLICACION CUANDO SE ESTA EJECUTANDO UNA FUNCION
-## usando sys.exit por ahora
 ## CHEQUEAR AFTER SCRIPTS cuando se cierra la app
-
+## AGREGAR ALGO PARA FRENAR EL CIERRE DE LA VENTANA HASTA QUE GUARDE EN BBDD
+#https://github.com/juarezefren/mecatronica/blob/master/main.py
+#es el codigo para el treeview del frame izquierdo
 
 #Creacion del cuadro principal de la GUI
 root = ctk.CTk()
@@ -28,6 +29,7 @@ root.grid_rowconfigure((0, 1, 2), weight=1)
 #Creacion de los cuadros interiores de la GUI
 frame_izq = ctk.CTkFrame(master=root, width=170)
 label_ronda_frameizq = ctk.CTkLabel(master=frame_izq, width=60, text=f'Ronda #')
+label_jugador_frameizq = ctk.CTkLabel(master=frame_izq, width=60, text=f'jugador #')
 frame_der = ctk.CTkFrame(master=root, width=170)
 
 #Creacion del cuadro de entrada y boton submit principal
@@ -76,6 +78,6 @@ boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
 
 
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, frame_der]
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, frame_der]
 if __name__ == '__main__':
     root.mainloop()
