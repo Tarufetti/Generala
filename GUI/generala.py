@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from tkinter import ttk
 from CTkMessagebox import CTkMessagebox
 from PIL import Image
 import os
@@ -27,12 +28,17 @@ root.grid_columnconfigure((2, 3), weight=0)
 root.grid_rowconfigure((0, 1, 2), weight=1)
 
 #Creacion de los cuadros interiores de la GUI
-frame_izq = ctk.CTkFrame(master=root, width=170)
+frame_izq = ctk.CTkFrame(master=root, width=180)
 label_ronda_frameizq = ctk.CTkLabel(master=frame_izq, width=60, text=f'Ronda #')
 label_jugador_frameizq = ctk.CTkLabel(master=frame_izq, width=60, text=f'jugador #')
-frame_der = ctk.CTkFrame(master=root, width=170)
+grilla_puntajes_izq = ttk.Treeview(master=frame_izq, height=13, columns='Puntos')
+grilla_puntajes_izq.column("#0",width=100, anchor='w')
+grilla_puntajes_izq.column("Puntos",width=50, anchor='center')
+grilla_puntajes_izq.heading("#0", text="Jugada", anchor='center')
+grilla_puntajes_izq.heading("Puntos", text="Puntaje", anchor='center')
+frame_der = ctk.CTkFrame(master=root, width=180)
 
-#Creacion del cuadro de entrada y boton submit principal
+#Creacion del cuadro de entrada y boton submit pcncipal
 entrada = ctk.StringVar()
 entry = ctk.CTkEntry(root, width=750)
 entry.grid(row=3, column=1, columnspan=6, padx=(20, 0), pady=(20, 20), sticky="e")
@@ -78,6 +84,6 @@ boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
 
 
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, frame_der]
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der]
 if __name__ == '__main__':
     root.mainloop()

@@ -6,6 +6,7 @@ import sys
 
 
 ubicacion_en_tablero = {'Numero de ronda':0,'Numero de tiro':1,'Escalera':2, 'Full':3, 'Poker':4, 'Generala':5, 'Generala doble':6, '1':7, '2':8, '3':9, '4':10, '5':11, '6':12, 'total':13}
+lista_jugadas = ['Escalera','Full','Poker','Generala','Generala Doble','1','2','3','4','5','6','Total']
 
 #Creacion de la clase Jugador
 class Jugador:
@@ -77,13 +78,16 @@ def check_jugadas_chicas(dados_elegidos:list,jugador:object) -> list:
         if v != 0 and jugador.puntaje[ubicacion_en_tablero[k]] is None:
             lista_jugadas_chicas.append(f'{v} al {k}')
     return lista_jugadas_chicas
-def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> list:
+def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object,label) -> list:
     '''
     Se ingresan los dados al fin del tiro y se muestran las opciones disponibles
     '''
     grandes = check_jugadas_grandes(dados_elegidos, nro_tiro,jugador)
     chicas = check_jugadas_chicas(dados_elegidos,jugador)
     grandes.extend(chicas)
+    label.place_forget()
+    label.configure(text='Jugadas: ', font=('roboto',18))
+    label.place(relx=0.20, rely=0.50)
     for i,jug in enumerate(grandes, start=1):
         print(f'{i}- {jug}')
     if nro_tiro == 3:
@@ -114,7 +118,7 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object) -> 
             jugador.puntaje[1] += 1
             menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos)),jugador.puntaje[1],jugador)
 
-def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, frame_der):
+def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der):
     '''
     Comienza nueva partida.
     '''
@@ -154,16 +158,30 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
 
 
     for turno in range(1,12): #Bucle para la ejecucion de los turnos
-        label_ronda_frameizq.configure(text=f'Ronda numero {turno}', font=('roboto', 14, 'bold'))
+        label_ronda_frameizq.configure(text=f'Ronda #: {turno}', font=('roboto', 24, 'bold'))
         label_ronda_frameizq.place(relx=0.2, rely=0.02)
 
         for numero, jugador in JUGADORES.items(): #Dentro de cada turno, bucle para la ejecucion del tiro de cada jugador
-            label_jugador_frameizq.configure(text=f'Jugador: {jugador.nombre}', font=('roboto', 14, 'bold'))
-            label_jugador_frameizq.place(relx=0.2, rely=0.2)
+            label_jugador_frameizq.configure(text=f'Jugador:\n{jugador.nombre}', font=('roboto', 20, 'bold'))
+            label_jugador_frameizq.place(relx=0.2, rely=0.22)
+            indice_puntaje = 2
+            id_elemento = 0
+            tag_grilla= 'par'
+            for i in lista_jugadas:
+                grilla_puntajes_izq.insert("",'end', iid=id_elemento, text=i, values=(f'{jugador.puntaje[indice_puntaje]}'), tags=(f'{tag_grilla}'))
+                indice_puntaje +=1
+                id_elemento +=1
+                if tag_grilla == 'par':
+                    tag_grilla = 'impar'
+                else : tag_grilla = 'par'
+            grilla_puntajes_izq.tag_configure('par', background='white')
+            grilla_puntajes_izq.tag_configure('impar', background='light blue')
+            grilla_puntajes_izq.place(relx=0.1,rely=0.3)
+
             label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
             boton_submit.wait_variable(entrada)
             dados_elegidos = tirada([], entry, entrada, boton_submit)
-            menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador)
+            menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador,label)
             jugador.puntaje[0] += 1
         if pregunta_continuar(numero_partida):
             pass
