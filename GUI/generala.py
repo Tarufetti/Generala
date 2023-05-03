@@ -1,15 +1,13 @@
 import customtkinter as ctk
 from tkinter import ttk
 from CTkMessagebox import CTkMessagebox
-from PIL import Image
 import os
 import funciones
 
 ## CHEQUEAR EL TEMA DEL CIERRE DE LA APLICACION CUANDO SE ESTA EJECUTANDO UNA FUNCION
 ## CHEQUEAR AFTER SCRIPTS cuando se cierra la app
 ## AGREGAR ALGO PARA FRENAR EL CIERRE DE LA VENTANA HASTA QUE GUARDE EN BBDD
-#https://github.com/juarezefren/mecatronica/blob/master/main.py
-#es el codigo para el treeview del frame izquierdo
+#hay que cambiar tirada para que tome dice y lo borre cuando se aprieta nueva tirada
 
 #Creacion del cuadro principal de la GUI
 root = ctk.CTk()
@@ -48,14 +46,6 @@ boton_submit.grid(row=3, column=7, padx=(20, 20), pady=(20, 20), sticky="nsew")
 #Consulta a la BBDD por el numero de la ultima partida
 numero_partida = 1
 
-#Creacion de las imagenes de dados
-dice = []
-dice_relx = 0.20 # incrementa de a 0.15 para mantener simetria
-dice_rely = 0.15
-for i in range(1,6):
-    img = ctk.CTkImage(Image.open(f'{cwd}/resources/dice{i}.png'),size=(100,100))
-    img_label = ctk.CTkLabel(master=root,text='', image=img)
-    dice.append(img_label)
 
 #Creacion de los checkboxes
 checkboxes = []
@@ -84,6 +74,6 @@ boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
 
 
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der]
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der, bienvenido]
 if __name__ == '__main__':
     root.mainloop()

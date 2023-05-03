@@ -1,10 +1,11 @@
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
 from collections import defaultdict
+from PIL import Image
 import random
-import sys
+import os
 
-
+cwd = os.getcwd()
 ubicacion_en_tablero = {'Numero de ronda':0,'Numero de tiro':1,'Escalera':2, 'Full':3, 'Poker':4, 'Generala':5, 'Generala doble':6, '1':7, '2':8, '3':9, '4':10, '5':11, '6':12, 'total':13}
 lista_jugadas = ['Escalera','Full','Poker','Generala','Generala Doble','1','2','3','4','5','6','Total']
 
@@ -19,26 +20,36 @@ class Jugador:
     
     def __str__(self) -> str:
         return f'{self.nombre}\nPuntaje: {self.puntaje}\n'
-    
+
 def submit(entrada, entry):#El uso principal es para poder implementar el wait_variable mas adelante
     '''
     Al presionar el boton Submit, entrada se modifica.
     '''
     entrada.set(entry.get())
 
-def tirada(dados_elegidos, entry, entrada, boton_submit) -> list:
+def tirada(dados_elegidos, entrada, boton_submit, root, label, bienvenido) -> list:
     '''
     Realiza la tirada de dados. Toma una lista (vacia o no) y retorna una lista de dados arrojados
     '''
+    #Creacion de las imagenes de dados
     dados_tirados = []
     boton_submit.wait_variable(entrada)
+    bienvenido.place_forget()
+    label.place_forget()
     for _ in range((5-len(dados_elegidos))):
         dados_tirados.append(random.randint(1,6))
     dados_elegidos.extend(dados_tirados)
     dados_elegidos.sort()
-    print(dados_elegidos)
-    print(dados_dic[dados_elegidos[0]],dados_dic[dados_elegidos[1]],dados_dic[dados_elegidos[2]],dados_dic[dados_elegidos[3]],dados_dic[dados_elegidos[4]])
-    return dados_elegidos
+    dice = []
+    dice_relx = 0.20 # incrementa de a 0.12 para mantener simetria
+    dice_rely = 0.15
+    for i in dados_elegidos:
+        img = ctk.CTkImage(Image.open(f'{cwd}/resources/dice{i}.png'),size=(100,100))
+        img_label = ctk.CTkLabel(master=root,text='', image=img)
+        img_label.place(relx=dice_relx, rely=dice_rely)
+        dice.append(img_label)
+        dice_relx += 0.12
+    return dados_elegidos, dice
 
 def check_jugadas_grandes(dados_elegidos:list,nro_tiro:int,jugador:object) -> list:
     '''
@@ -78,7 +89,7 @@ def check_jugadas_chicas(dados_elegidos:list,jugador:object) -> list:
         if v != 0 and jugador.puntaje[ubicacion_en_tablero[k]] is None:
             lista_jugadas_chicas.append(f'{v} al {k}')
     return lista_jugadas_chicas
-def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object,label) -> list:
+def menu_despues_de_tirada(dados_elegidos: list, nro_tiro:int, jugador:object, label) -> list:
     '''
     Se ingresan los dados al fin del tiro y se muestran las opciones disponibles
     '''
@@ -92,12 +103,12 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object,labe
         print(f'{i}- {jug}')
     if nro_tiro == 3:
         if len(grandes) == 0:
-            tachar(jugador)
+            #tachar(jugador)
             return
         eleccion = input(f'\nPresione 1 para plantar o 2 para tachar una jugada: ')
         ref_anotacion = ["1","2"]
         while eleccion not in ref_anotacion: # esta es la validacion para un ingreso erróneo
-            print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
+            print("\n*** ERROR! Lo ingresado no fue recibido correctamente.s Por favor, ingrese una opción válida.")
             eleccion = input(f'\nPresione 1 para plantar o 2 para tachar una jugada: ')
         if eleccion == '1': # Planta
             plantar(grandes, jugador, nro_tiro)        
@@ -118,7 +129,7 @@ def menu_despues_de_tirada(dados_elegidos: list,nro_tiro:int,jugador:object,labe
             jugador.puntaje[1] += 1
             menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos)),jugador.puntaje[1],jugador)
 
-def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der):
+def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der, bienvenido):
     '''
     Comienza nueva partida.
     '''
@@ -180,7 +191,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
 
             label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
             boton_submit.wait_variable(entrada)
-            dados_elegidos = tirada([], entry, entrada, boton_submit)
+            dados_elegidos = tirada([], entrada, boton_submit, root, label, bienvenido)
             menu_despues_de_tirada(dados_elegidos,jugador.puntaje[1],jugador,label)
             jugador.puntaje[0] += 1
         if pregunta_continuar(numero_partida):
