@@ -17,7 +17,7 @@ root.iconbitmap(f'{cwd}\\resources\\icono.ico')
 root.geometry('1120x600')
 root.resizable(False,False)
 root.protocol("WM_DELETE_WINDOW", lambda: funciones.cerrar_programa(root))
-ctk.set_appearance_mode('system')
+ctk.set_appearance_mode('light')
 
 
 #Configuracion de un grid
@@ -36,13 +36,14 @@ grilla_puntajes_izq.heading("#0", text="Jugada", anchor='center')
 grilla_puntajes_izq.heading("Puntos", text="Puntaje", anchor='center')
 frame_der = ctk.CTkFrame(master=root, width=180)
 
-#Creacion del cuadro de entrada y boton submit pcncipal
+#Creacion del cuadro de entrada y botones
 entrada = ctk.StringVar()
 entry = ctk.CTkEntry(root, width=750)
 entry.grid(row=3, column=1, columnspan=6, padx=(20, 0), pady=(20, 20), sticky="e")
-boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='dissabled', command=lambda: funciones.submit(entrada, entry))
+boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='disabled', command=lambda: funciones.submit(entrada, entry))
 boton_submit.grid(row=3, column=7, padx=(20, 20), pady=(20, 20), sticky="nsew")
-
+boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: funciones.elegir_dados())
+boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: funciones.tachar())
 #Consulta a la BBDD por el numero de la ultima partida
 numero_partida = 1
 
@@ -74,6 +75,6 @@ boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
 
 
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der, bienvenido]
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der, bienvenido, boton_elegir_dados, boton_plantar]
 if __name__ == '__main__':
     root.mainloop()
