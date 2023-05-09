@@ -42,19 +42,9 @@ entry = ctk.CTkEntry(root, width=750)
 entry.grid(row=3, column=1, columnspan=6, padx=(20, 0), pady=(20, 20), sticky="e")
 boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='disabled', command=lambda: funciones.submit(entrada, entry))
 boton_submit.grid(row=3, column=7, padx=(20, 20), pady=(20, 20), sticky="nsew")
-boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: funciones.elegir_dados())
-boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: funciones.tachar())
 #Consulta a la BBDD por el numero de la ultima partida
 numero_partida = 1
 
-
-#Creacion de los checkboxes
-checkboxes = []
-check_relx = 0.25 #incrementa de a 0.15
-check_rely = 0.45
-for i in range(1,6):
-    checkbox = ctk.CTkCheckBox(root, text=f'{i}')
-    checkboxes.append(checkbox)
 
 #label de bienvenido al juego
 bienvenido = ctk.CTkLabel(root, text='Bienvenido a la Generala!', font=('roboto',60, 'bold'))
@@ -75,6 +65,6 @@ boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
 
 
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der, bienvenido, boton_elegir_dados, boton_plantar]
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der, bienvenido]
 if __name__ == '__main__':
     root.mainloop()
