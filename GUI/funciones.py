@@ -41,9 +41,9 @@ def tirada(dados_elegidos, dice, entrada, boton_submit, root, label, bienvenido)
     dados_elegidos.extend(dados_tirados)
     dados_elegidos.sort()
     #Creacion de las imagenes de dados
-    if len(dice)>0:
-        for i in dice:
-            i.place_forget()
+    for i in dice:
+        i.place_forget()
+        dice.remove(i)
     dice_relx = 0.20 # incrementa de a 0.12 para mantener simetria
     dice_rely = 0.15
     for i in dados_elegidos:
@@ -93,7 +93,7 @@ def check_jugadas_chicas(dados_elegidos:list,jugador:object) -> list:
             lista_jugadas_chicas.append(f'{v} al {k}')
     return lista_jugadas_chicas
 
-def elegir_dados(dados_elegidos, root, entrada, boton_submit, boton_elegir_dados, boton_plantar) -> list:
+def elegir_dados(dados_elegidos, jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar,label_tiro_frameizq) -> list:
     '''
     Toma los dados resultantes de la tirada y retorna los dados que el jugador desea conservar para el siguiente tiro
     '''
@@ -117,7 +117,12 @@ def elegir_dados(dados_elegidos, root, entrada, boton_submit, boton_elegir_dados
             dados.append(dados_elegidos[i])
     
     boton_submit.configure(text='Tirar!', fg_color='red', border_color='#cc0000')
+    for i in checkboxes:
+        i.place_forget()
+    print(dados)
     dados.sort()
+    jugador.puntaje[1] += 1
+    label_tiro_frameizq.configure(text=f'Tiro #{jugador.puntaje[1]}')
     return dados
 
 def plantar(jugadas:list,jugador:object,nro_tiro:int) -> None:
@@ -200,7 +205,7 @@ def menu_despues_de_tirada(dados_elegidos: list, nro_tiro:int, jugador:object, r
             boton_plantar.place(relx=0.45, rely=0.80)
     boton_submit.wait_variable(entrada)
 
-def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, grilla_puntajes_izq, frame_der, bienvenido):
+def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, grilla_puntajes_izq, frame_der, bienvenido, boton_elegir_dados, boton_plantar):
     '''
     Comienza nueva partida.
     '''
@@ -212,7 +217,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     boton_submit.configure(text='Enter!', fg_color='blue',state='normal')
 
     #Creacion botones elegir, plantar y tachar
-    boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos, root, entrada, boton_submit, boton_elegir_dados, boton_plantar), dice, entrada, boton_submit, root, label, bienvenido), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
+    boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos, jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar, label_tiro_frameizq), dice, entrada, boton_submit, root, label, bienvenido), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
     boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar())
     boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar())
 
@@ -249,10 +254,13 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     for turno in range(1,12): #Bucle para la ejecucion de los turnos
         label_ronda_frameizq.configure(text=f'Ronda #: {turno}', font=('roboto', 24, 'bold'))
         label_ronda_frameizq.place(relx=0.2, rely=0.02)
+        
 
         for numero, jugador in JUGADORES.items(): #Dentro de cada turno, bucle para la ejecucion del tiro de cada jugador
             label_jugador_frameizq.configure(text=f'Jugador:\n{jugador.nombre}', font=('roboto', 20, 'bold'))
             label_jugador_frameizq.place(relx=0.2, rely=0.22)
+            label_tiro_frameizq.configure(text=f'Tiro #: {jugador.puntaje[1]}', font=('roboto', 24, 'bold'))
+            label_tiro_frameizq.place(relx=0.2, rely=0.06)
             indice_puntaje = 2
             id_elemento = 0
             tag_grilla= 'par'
