@@ -51,15 +51,6 @@ boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar',
 #Consulta a la BBDD por el numero de la ultima partida
 numero_partida = 1
 
-
-#Creacion de los checkboxes
-checkboxes = []
-check_relx = 0.25 #incrementa de a 0.15
-check_rely = 0.45
-for i in range(1,6):
-    checkbox = ctk.CTkCheckBox(root, text=f'{i}')
-    checkboxes.append(checkbox)
-
 #label de bienvenido al juego
 bienvenido = ctk.CTkLabel(root, text='Bienvenido a la Generala!', font=('roboto',60, 'bold'))
 bienvenido.place(relx= 0.20, rely=0.10)

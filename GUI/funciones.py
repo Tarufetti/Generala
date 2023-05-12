@@ -4,11 +4,13 @@ from collections import defaultdict
 from PIL import Image
 import random
 import os
+import sys
 
 cwd = os.getcwd()
 ubicacion_en_tablero = {'Numero de ronda':0,'Numero de tiro':1,'Escalera':2, 'Full':3, 'Poker':4, 'Generala':5, 'Generala doble':6, '1':7, '2':8, '3':9, '4':10, '5':11, '6':12, 'total':13}
 lista_jugadas = ['Escalera','Full','Poker','Generala','Generala Doble','1','2','3','4','5','6','Total']
 dice = []
+dados_elegidos = []
 
 #Creacion de la clase Jugador
 class Jugador:
@@ -32,6 +34,7 @@ def tirada(dados_elegidos, dice, entrada, boton_submit, root, label, bienvenido)
     '''
     Realiza la tirada de dados. Toma una lista (vacia o no) y retorna una lista de dados arrojados
     '''
+    print(dados_elegidos, 'dados')
     dados_tirados = []
     boton_submit.wait_variable(entrada)
     bienvenido.place_forget()
@@ -40,6 +43,8 @@ def tirada(dados_elegidos, dice, entrada, boton_submit, root, label, bienvenido)
         dados_tirados.append(random.randint(1,6))
     dados_elegidos.extend(dados_tirados)
     dados_elegidos.sort()
+    print(dados_elegidos, 'dados2')
+
     #Creacion de las imagenes de dados
     for i in dice:
         i.place_forget()
@@ -119,13 +124,17 @@ def elegir_dados(dados_elegidos, jugador, root, entrada, boton_submit, boton_ele
     boton_submit.configure(text='Tirar!', fg_color='red', border_color='#cc0000')
     for i in checkboxes:
         i.place_forget()
-    print(dados)
     dados.sort()
+    print('elegir \n',dados_elegidos, dados)
+    dados_elegidos = dados
+    print('nuevos dados elegidos\n',dados_elegidos)
+
     jugador.puntaje[1] += 1
     label_tiro_frameizq.configure(text=f'Tiro #{jugador.puntaje[1]}')
-    return dados
+    return dados_elegidos
 
 def plantar(jugadas:list,jugador:object,nro_tiro:int) -> None:
+        return
         global jugadas_grandes
         global ubicacion_en_tablero
         eleccion = int(input('\nSeleccione el numero que corresponde a la jugada que quiere plantar: '))-1
@@ -153,20 +162,11 @@ def tachar(jugador:object) -> None:
     '''
     Se anula una de las posiciones en la tabla de puntajes
     '''
-    global ubicacion_en_tablero
+    sys.exit()
     ubicacion_invertida_en_tablero = {0:'Numero de ronda',1:'Numero de tiro',2:'Escalera',3:'Full',4: 'Poker', 5:'Generala', 6:'Generala doble', 7:'1', 8:'2', 9:'3', 10:'4',11: '5', 12:'6',13: 'total'}
     tachables = []
     print(f'\nPuede tachar las siguientes jugadas: \n')
-    contador_menu = 1
-    for i in range(2,13):
-        if jugador.puntaje[i] is None:
-            tachables.append(ubicacion_invertida_en_tablero[i])
-            print(f'{contador_menu}: {ubicacion_invertida_en_tablero[i]}')
-            contador_menu +=1
     entrada = input(f'Escriba la jugada que quiere tachar de la lista de arriba: ').capitalize()
-    while entrada not in tachables:
-        print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
-        entrada = input(f'Escriba la jugada que quiere tachar de la lista de mas arriba: ')
     jugador.puntaje[ubicacion_en_tablero[entrada]] = 0
     jugador.puntaje[1] = 1
     print(f'\nSe ha tachado la siguiente jugada: {ubicacion_invertida_en_tablero[entrada]}')
@@ -184,7 +184,7 @@ def menu_despues_de_tirada(dados_elegidos: list, nro_tiro:int, jugador:object, r
     label.place(relx=0.20, rely=0.45)
     jugadas_tiro_actual = []
     for i,jug in enumerate(grandes, start=1):
-        label_lista_jugadas = ctk.CTkLabel(master=root, text=(f'{i}- {jug}'), font=('roboto',16))
+        label_lista_jugadas = ctk.CTkLabel(master=root, text=(f'{i}- {jug}                '), font=('roboto',16))
         jugadas_tiro_actual.append(label_lista_jugadas)
     rely = 0.50
     for i in jugadas_tiro_actual:
@@ -203,7 +203,6 @@ def menu_despues_de_tirada(dados_elegidos: list, nro_tiro:int, jugador:object, r
         else:
             boton_elegir_dados.place(relx=0.30, rely=0.80)
             boton_plantar.place(relx=0.45, rely=0.80)
-    boton_submit.wait_variable(entrada)
 
 def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, grilla_puntajes_izq, frame_der, bienvenido, boton_elegir_dados, boton_plantar):
     '''
@@ -219,7 +218,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     #Creacion botones elegir, plantar y tachar
     boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(dados_elegidos, jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar, label_tiro_frameizq), dice, entrada, boton_submit, root, label, bienvenido), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
     boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar())
-    boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar())
+    boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar(jugador))
 
     
     #comienza la ejecucion del juego
@@ -252,7 +251,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
 
 
     for turno in range(1,12): #Bucle para la ejecucion de los turnos
-        label_ronda_frameizq.configure(text=f'Ronda #: {turno}', font=('roboto', 24, 'bold'))
+        label_ronda_frameizq.configure(text=f'Ronda #: {turno} ', font=('roboto', 24, 'bold'))
         label_ronda_frameizq.place(relx=0.2, rely=0.02)
         
 
@@ -276,12 +275,11 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
             grilla_puntajes_izq.place(relx=0.1,rely=0.3)
 
             label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
+            menu_despues_de_tirada(tirada(dados_elegidos, dice, entrada, boton_submit, root, label, bienvenido), jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar)
+            print('termino menu')
             boton_submit.wait_variable(entrada)
-            dados_elegidos = tirada([], dice, entrada, boton_submit, root, label, bienvenido)
-            menu_despues_de_tirada(dados_elegidos, jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar)
             jugador.puntaje[0] += 1
-        if pregunta_continuar(numero_partida):
-            pass
+        
     sumar_puntajes(JUGADORES)
     volver_a_jugar = input(f'\nDesea volver a jugar?\nPresione 1 para volver a jugar o ENTER para finalizar\n')
     if volver_a_jugar == '1':
