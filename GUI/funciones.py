@@ -7,10 +7,14 @@ import os
 import sys
 
 cwd = os.getcwd()
-ubicacion_en_tablero = {'Numero de ronda':0,'Numero de tiro':1,'Escalera':2, 'Full':3, 'Poker':4, 'Generala':5, 'Generala doble':6, '1':7, '2':8, '3':9, '4':10, '5':11, '6':12, 'total':13}
-lista_jugadas = ['Escalera','Full','Poker','Generala','Generala Doble','1','2','3','4','5','6','Total']
+UBICACION_EN_TABLERO = {'Numero de ronda':0,'Numero de tiro':1,'Escalera':2, 'Full':3, 'Poker':4, 'Generala':5, 'Generala doble':6, '1':7, '2':8, '3':9, '4':10, '5':11, '6':12, 'total':13}
+LISTA_JUGADAS = ['Escalera','Full','Poker','Generala','Generala Doble','1','2','3','4','5','6','Total']
 dice = []
 dados_elegidos = []
+jugadas_tiro_actual = []
+booleano = True
+
+
 
 
 #Creacion de la clase Jugador
@@ -93,7 +97,7 @@ def check_jugadas_chicas(dados_elegidos:list,jugador:object) -> list:
             jugadas_chicas_dic[f'{i}'] = i * dados_elegidos.count(i)
     lista_jugadas_chicas = []
     for k,v in jugadas_chicas_dic.items():
-        if v != 0 and jugador.puntaje[ubicacion_en_tablero[k]] is None:
+        if v != 0 and jugador.puntaje[UBICACION_EN_TABLERO[k]] is None:
             lista_jugadas_chicas.append(f'{v} al {k}')
     return lista_jugadas_chicas
 
@@ -131,10 +135,11 @@ def elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton
     label_tiro_frameizq.configure(text=f'Tiro #{jugador.puntaje[1]}')
     return dados_elegidos
 
-def plantar(jugadas:list,jugador:object,nro_tiro:int) -> None:
-        return
+def plantar(jugadas:list,jugador:object,nro_tiro:int, booleano) -> None:
+        booleano = False
+        return booleano
         global jugadas_grandes
-        global ubicacion_en_tablero
+        global UBICACION_EN_TABLERO
         eleccion = int(input('\nSeleccione el numero que corresponde a la jugada que quiere plantar: '))-1
         while eleccion > len(jugadas) or eleccion < 0: #esta es la validacion para un ingreso erróneo
             print("\n*** ERROR! Lo ingresado no fue recibido correctamente. Por favor, ingrese una opción válida.")
@@ -156,23 +161,70 @@ def plantar(jugadas:list,jugador:object,nro_tiro:int) -> None:
                 jugador.puntaje[1] = 1
         print(f'\nSe ha guardado la jugada {jugadas[eleccion]}\n')
 
-def tachar(jugador:object) -> None:
+def tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label):
     '''
     Se anula una de las posiciones en la tabla de puntajes
     '''
-    sys.exit()
-    ubicacion_invertida_en_tablero = {0:'Numero de ronda',1:'Numero de tiro',2:'Escalera',3:'Full',4: 'Poker', 5:'Generala', 6:'Generala doble', 7:'1', 8:'2', 9:'3', 10:'4',11: '5', 12:'6',13: 'total'}
+    global jugadas_tiro_actual
+    global booleano
+
+    #limpiar el centro de la GUI
+    boton_plantar.place_forget()
+    boton_tachar.place_forget()
+    
+    #activar boton submit
+    boton_submit.configure(text='Confirmar!', fg_color='blue', state='normal')
+
+    #opciones disponibles para tachar
+    label.configure(text='Elija la jugada que desea tachar: ', font=('roboto',18))
+    for i in jugadas_tiro_actual:
+        i.place_forget()
+    jugadas_tiro_actual.clear()
     tachables = []
-    print(f'\nPuede tachar las siguientes jugadas: \n')
-    entrada = input(f'Escriba la jugada que quiere tachar de la lista de arriba: ').capitalize()
-    jugador.puntaje[ubicacion_en_tablero[entrada]] = 0
-    jugador.puntaje[1] = 1
-    print(f'\nSe ha tachado la siguiente jugada: {ubicacion_invertida_en_tablero[entrada]}')
+    indice_tachables = 1
+    rely = 0.50
+    rely2= 0.50
+    for ind,j in enumerate(jugador.puntaje[2:-1]):
+        if j is None:
+            label_tachables = ctk.CTkLabel(master=root, text=(f'{indice_tachables}- {LISTA_JUGADAS[ind]}                '), font=('roboto',14))
+            jugadas_tiro_actual.append(label_tachables)
+        indice_tachables +=1
+        tachables.append(f'{LISTA_JUGADAS[ind]}')
+    if len(jugadas_tiro_actual) >= 6:
+        for ind,_ in enumerate(jugadas_tiro_actual):
+            if ind < 6:
+                _.place(relx=0.20, rely=rely)
+                rely += 0.05
+            elif ind >=6:
+                _.place(relx=0.40, rely=rely2)
+                rely2 += 0.05
+    else:
+        for _ in jugadas_tiro_actual:
+            _.place(relx=0.20, rely=rely)
+            rely += 0.05
+    entry.configure(state='normal')
+    boton_submit.wait_variable(entrada)
+    x = entry.get()
+    while not x.isdigit(): #Validacion de entrada y cantidad de jugadores
+        CTkMessagebox(title='Generala', icon = 'cancel', message = 'Seleccione la jugada utilizando NUMEROS', option_1 = 'OK', button_color='blue')
+        boton_submit.wait_variable(entrada)
+        x = entry.get()
+    entry.configure(state='disabled')
+    jugador.puntaje[UBICACION_EN_TABLERO[tachables[int(x)-1]]] = 0 #modifica el valor de determinada jugada, de None a 0, para indicar que esta anulada. en GUI figura X
+    jugador.puntaje[1] = 1 #reinicia tiro a #1
+
+    booleano = False
+    return booleano
 
 def menu_despues_de_tirada(dados_elegidos: list, nro_tiro:int, jugador:object, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar) -> list:
     '''
     Se ingresan los dados al fin del tiro y se muestran las opciones disponibles
     '''
+    global jugadas_tiro_actual
+    for i in jugadas_tiro_actual: # reiniciar la lista de jugadas para el tiro actual
+        i.place_forget()
+    jugadas_tiro_actual.clear()
+
     grandes = check_jugadas_grandes(dados_elegidos, nro_tiro,jugador)
     chicas = check_jugadas_chicas(dados_elegidos,jugador)
     grandes.extend(chicas)
@@ -180,7 +232,6 @@ def menu_despues_de_tirada(dados_elegidos: list, nro_tiro:int, jugador:object, r
     label.place_forget()
     label.configure(text='Jugadas: ', font=('roboto',18))
     label.place(relx=0.20, rely=0.45)
-    jugadas_tiro_actual = []
     
     for i,jug in enumerate(grandes, start=1):
         label_lista_jugadas = ctk.CTkLabel(master=root, text=(f'{i}- {jug}                '), font=('roboto',16))
@@ -207,7 +258,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     '''
     Comienza nueva partida.
     '''
-    
+    global booleano
     #modifica la pantalla principal
     boton_n_partida.place_forget()
     boton_r_partida.place_forget()
@@ -216,8 +267,8 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
 
     #Creacion botones elegir, plantar y tachar
     boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar, label_tiro_frameizq), dice, entrada, boton_submit, root, label, bienvenido), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
-    boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar())
-    boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar(jugador))
+    boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(booleano))
+    boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label))
 
     
     #comienza la ejecucion del juego
@@ -230,9 +281,8 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
         boton_submit.wait_variable(entrada)
         cant_jugadores = entry.get()
     JUGADORES = defaultdict(lambda: 'No existe dicho jugador')
-    numero_partida = 1#recolectar de BD el numero, puse 1 para probar
     entry.delete(0, ctk.END) #Reinicia el texto del entry box
-
+    numero_partida = 1#recolectar de BD el numero, puse 1 para probar
 
     for i in range(1, int(cant_jugadores)+1): #Seleccion de los nombres de los jugadores
         label.configure(text=f'Elige el nombre del jugador {i}:')
@@ -263,7 +313,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
             indice_puntaje = 2
             id_elemento = 0
             tag_grilla= 'par'
-            for i in lista_jugadas:
+            for i in LISTA_JUGADAS:
                 grilla_puntajes_izq.insert("",'end', iid=id_elemento, text=i, values=(f'{jugador.puntaje[indice_puntaje] if jugador.puntaje[indice_puntaje] is not None else 0}'), tags=(f'{tag_grilla}'))
                 indice_puntaje +=1
                 id_elemento +=1
@@ -276,12 +326,13 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
 
             label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
             menu_despues_de_tirada(tirada(dados_elegidos, dice, entrada, boton_submit, root, label, bienvenido), jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar)
-            boton_submit.wait_variable(entrada)
-            print(dados_elegidos, 'ultimo dados elegidos antes de seguir')
-            boton_submit.wait_variable(entrada)
-            print(jugador.puntaje[0], 'ronda antes de sumar')
+            while booleano:
+                print('bool')
+                boton_submit.wait_variable(entrada)
             jugador.puntaje[0] += 1
             print(jugador.puntaje[0], 'ronda despues de sumar')
+            print(booleano)
+            booleano = True
 
 
         

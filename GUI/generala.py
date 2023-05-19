@@ -7,9 +7,7 @@ import funciones
 ## CHEQUEAR EL TEMA DEL CIERRE DE LA APLICACION CUANDO SE ESTA EJECUTANDO UNA FUNCION
 ## CHEQUEAR AFTER SCRIPTS cuando se cierra la app
 ## AGREGAR ALGO PARA FRENAR EL CIERRE DE LA VENTANA HASTA QUE GUARDE EN BBDD
-#agregar algo a plantar o tachar para que termine la ejecucion
 
-#elegir dados toma siempre dados elegidos inicialmente.
 #pasar grilla a generala py, averiguar como se modifican valores
 #cuando ronda pasa a 2, grilla izq tira error porque ya existe valor
 
