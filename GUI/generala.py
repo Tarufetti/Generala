@@ -9,7 +9,9 @@ import funciones
 ## AGREGAR ALGO PARA FRENAR EL CIERRE DE LA VENTANA HASTA QUE GUARDE EN BBDD
 
 #pasar grilla a generala py, averiguar como se modifican valores
-#cuando ronda pasa a 2, grilla izq tira error porque ya existe valor
+
+#despues de tachar, en el nuevo tiro no cambia los dados
+
 
 
 #Creacion del cuadro principal de la GUI

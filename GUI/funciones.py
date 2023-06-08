@@ -7,7 +7,7 @@ import os
 import sys
 
 cwd = os.getcwd()
-UBICACION_EN_TABLERO = {'Numero de ronda':0,'Numero de tiro':1,'Escalera':2, 'Full':3, 'Poker':4, 'Generala':5, 'Generala doble':6, '1':7, '2':8, '3':9, '4':10, '5':11, '6':12, 'total':13}
+UBICACION_EN_TABLERO = {'Numero de ronda':0,'Numero de tiro':1,'Escalera':2, 'Full':3, 'Poker':4, 'Generala':5, 'Generala Doble':6, '1':7, '2':8, '3':9, '4':10, '5':11, '6':12, 'total':13}
 LISTA_JUGADAS = ['Escalera','Full','Poker','Generala','Generala Doble','1','2','3','4','5','6','Total']
 dice = []
 dados_elegidos = []
@@ -109,7 +109,7 @@ def elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton
     dados= []
     boton_elegir_dados.place_forget()
     boton_plantar.place_forget()
-    boton_submit.configure(text='Confirmar!', fg_color='blue', state='normal')
+    boton_submit.configure(text='Confirmar!', fg_color='blue', state='normal', hover_color='light blue')
     #Creacion de los checkboxes
     checkboxes = []
     check_relx = 0.23 #incrementa de a 0.12
@@ -125,7 +125,7 @@ def elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton
         if check.get():
             dados.append(dados_elegidos[i])
     
-    boton_submit.configure(text='Tirar!', fg_color='red', border_color='#cc0000')
+    boton_submit.configure(text='Tirar!', fg_color='red', border_color='#cc0000', hover_color='red')
     for i in checkboxes:
         i.place_forget()
     dados.sort()
@@ -161,7 +161,7 @@ def plantar(jugadas:list,jugador:object,nro_tiro:int, booleano) -> None:
                 jugador.puntaje[1] = 1
         print(f'\nSe ha guardado la jugada {jugadas[eleccion]}\n')
 
-def tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label):
+def tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label, bienvenido):
     '''
     Se anula una de las posiciones en la tabla de puntajes
     '''
@@ -173,7 +173,7 @@ def tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_sub
     boton_tachar.place_forget()
     
     #activar boton submit
-    boton_submit.configure(text='Confirmar!', fg_color='blue', state='normal')
+    boton_submit.configure(text='Confirmar!', fg_color='blue', state='normal', hover_color='light blue')
 
     #opciones disponibles para tachar
     label.configure(text='Elija la jugada que desea tachar: ', font=('roboto',18))
@@ -209,12 +209,21 @@ def tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_sub
         CTkMessagebox(title='Generala', icon = 'cancel', message = 'Seleccione la jugada utilizando NUMEROS', option_1 = 'OK', button_color='blue')
         boton_submit.wait_variable(entrada)
         x = entry.get()
+    entry.delete(0, ctk.END) #Reinicia el texto del entry box
     entry.configure(state='disabled')
+    label.configure(text=f'Se ha tachado la siguiente jugada: \n {tachables[int(x)-1]}', font=('roboto',18))
+
+    for i in jugadas_tiro_actual:
+        i.place_forget()
+    jugadas_tiro_actual.clear()
+
+    boton_submit.wait_variable(entrada)
     jugador.puntaje[UBICACION_EN_TABLERO[tachables[int(x)-1]]] = 0 #modifica el valor de determinada jugada, de None a 0, para indicar que esta anulada. en GUI figura X
     jugador.puntaje[1] = 1 #reinicia tiro a #1
 
+    dados_elegidos = []
     booleano = False
-    return booleano
+    boton_submit.configure(text='Tirar!', fg_color='red', border_color='#cc0000', hover_color='red')
 
 def menu_despues_de_tirada(dados_elegidos: list, nro_tiro:int, jugador:object, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar) -> list:
     '''
@@ -268,7 +277,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     #Creacion botones elegir, plantar y tachar
     boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar, label_tiro_frameizq), dice, entrada, boton_submit, root, label, bienvenido), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
     boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(booleano))
-    boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label))
+    boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label, bienvenido))
 
     
     #comienza la ejecucion del juego
@@ -296,9 +305,20 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
         entry.delete(0, ctk.END)
     frame_izq.grid(row=0, column=0, rowspan=4, sticky="nsew")
     frame_der.grid(row=0, column=8, rowspan=4, sticky="nsew")
-    boton_submit.configure(text='Tirar!', fg_color='red', border_color='#cc0000')
+    boton_submit.configure(text='Tirar!', fg_color='red', border_color='#cc0000', hover_color='red')
     entry.configure(state='disabled')
-
+    
+    id_elemento = 0
+    tag_grilla= 'par'
+    for i in LISTA_JUGADAS:
+        grilla_puntajes_izq.insert("",'end', iid=id_elemento, text=i, values=('0'), tags=(f'{tag_grilla}'))
+        id_elemento +=1
+        if tag_grilla == 'par':
+            tag_grilla = 'impar'
+        else : tag_grilla = 'par'
+        grilla_puntajes_izq.tag_configure('par', background='white')
+        grilla_puntajes_izq.tag_configure('impar', background='light blue')
+    grilla_puntajes_izq.place(relx=0.1,rely=0.3)
 
     for turno in range(1,12): #Bucle para la ejecucion de los turnos
         label_ronda_frameizq.configure(text=f'Ronda #: {turno} ', font=('roboto', 24, 'bold'))
@@ -310,28 +330,17 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
             label_jugador_frameizq.place(relx=0.2, rely=0.22)
             label_tiro_frameizq.configure(text=f'Tiro #: {jugador.puntaje[1]}', font=('roboto', 24, 'bold'))
             label_tiro_frameizq.place(relx=0.2, rely=0.06)
-            indice_puntaje = 2
-            id_elemento = 0
-            tag_grilla= 'par'
-            for i in LISTA_JUGADAS:
-                grilla_puntajes_izq.insert("",'end', iid=id_elemento, text=i, values=(f'{jugador.puntaje[indice_puntaje] if jugador.puntaje[indice_puntaje] is not None else 0}'), tags=(f'{tag_grilla}'))
+            indice_puntaje = 1
+            for i in range(id_elemento):
                 indice_puntaje +=1
-                id_elemento +=1
-                if tag_grilla == 'par':
-                    tag_grilla = 'impar'
-                else : tag_grilla = 'par'
-            grilla_puntajes_izq.tag_configure('par', background='white')
-            grilla_puntajes_izq.tag_configure('impar', background='light blue')
-            grilla_puntajes_izq.place(relx=0.1,rely=0.3)
+                grilla_puntajes_izq.item(str(i), values=(f'x' if jugador.puntaje[indice_puntaje] == 0 else jugador.puntaje[indice_puntaje]) if jugador.puntaje[indice_puntaje] is not None else 0)
 
             label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
             menu_despues_de_tirada(tirada(dados_elegidos, dice, entrada, boton_submit, root, label, bienvenido), jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar)
             while booleano:
-                print('bool')
                 boton_submit.wait_variable(entrada)
+                print('submit', booleano)
             jugador.puntaje[0] += 1
-            print(jugador.puntaje[0], 'ronda despues de sumar')
-            print(booleano)
             booleano = True
 
 
