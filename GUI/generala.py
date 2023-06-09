@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk
-from CTkMessagebox import CTkMessagebox
+from PIL import Image
 import os
 import funciones
 
@@ -65,13 +65,15 @@ boton_r_partida.place(relx= 0.48, rely=0.45)
 boton_puntajes_altos = ctk.CTkButton(root, width=200, height=60, text='Puntajes mas altos', font=('roboto', 20), fg_color='blue',command=lambda: funciones.puntajes_altos(root,bienvenido, boton_n_partida, boton_r_partida, boton_puntajes_altos))
 boton_puntajes_altos.place(relx= 0.48, rely=0.60)
 
+img_dados_generico = []
+for i in range(5):
+                img = ctk.CTkImage(Image.open(f'{cwd}/resources/dices.png'),size=(100,100))
+                img_label = ctk.CTkLabel(master=root,text='', image=img)                
+                img_dados_generico.append(img_label)
 
 
 
 
-
-
-
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, grilla_puntajes_izq, frame_der, bienvenido, boton_elegir_dados, boton_plantar]
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, grilla_puntajes_izq, frame_der, bienvenido, img_dados_generico, boton_elegir_dados, boton_plantar]
 if __name__ == '__main__':
     root.mainloop()
