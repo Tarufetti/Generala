@@ -8,10 +8,6 @@ import funciones
 ## CHEQUEAR AFTER SCRIPTS cuando se cierra la app
 ## AGREGAR ALGO PARA FRENAR EL CIERRE DE LA VENTANA HASTA QUE GUARDE EN BBDD
 
-#pasar grilla a generala py, averiguar como se modifican valores
-
-#despues de tachar, en el nuevo tiro no cambia los dados
-
 
 
 #Creacion del cuadro principal de la GUI
