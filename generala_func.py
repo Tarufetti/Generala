@@ -2,7 +2,6 @@ import random
 from collections import defaultdict
 import sys
 import tabulate
-import funcDDBB as DB
 
 dados_dic = {1:'       \n|       |\n|   *   |\n|       |\n       ', 
             2:'       \n| *     |\n|       |\n|     * |\n       ',

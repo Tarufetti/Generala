@@ -7,8 +7,7 @@ import funciones
 ## CHEQUEAR EL TEMA DEL CIERRE DE LA APLICACION CUANDO SE ESTA EJECUTANDO UNA FUNCION
 ## CHEQUEAR AFTER SCRIPTS cuando se cierra la app
 ## AGREGAR ALGO PARA FRENAR EL CIERRE DE LA VENTANA HASTA QUE GUARDE EN BBDD
-
-
+#falta agregar que generala servida gana el juego
 
 #Creacion del cuadro principal de la GUI
 root = ctk.CTk()
@@ -37,6 +36,12 @@ grilla_puntajes_izq.column("Puntos",width=50, anchor='center')
 grilla_puntajes_izq.heading("#0", text="Jugada", anchor='center')
 grilla_puntajes_izq.heading("Puntos", text="Puntaje", anchor='center')
 frame_der = ctk.CTkFrame(master=root, width=180)
+label_frameder = ctk.CTkLabel(master=frame_der, width=60, text=f'Tabla de Puntajes')
+grilla_puntajes_der = ttk.Treeview(master=frame_der, height=13, columns='Totales')
+grilla_puntajes_der.column("#0",width=100, anchor='w')
+grilla_puntajes_der.column("Totales",width=50, anchor='center')
+grilla_puntajes_der.heading("#0", text="Jugador", anchor='center')
+grilla_puntajes_der.heading('Totales', text="Puntaje", anchor='center')
 
 #Creacion del cuadro de entrada y botones
 entrada = ctk.StringVar()
@@ -70,6 +75,6 @@ for i in range(5):
 
 
 
-args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, grilla_puntajes_izq, frame_der, bienvenido, img_dados_generico, boton_elegir_dados, boton_plantar]
+args = [root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, grilla_puntajes_izq, grilla_puntajes_der, frame_der, label_frameder, bienvenido, img_dados_generico, boton_elegir_dados, boton_plantar]
 if __name__ == '__main__':
     root.mainloop()
