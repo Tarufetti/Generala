@@ -29,6 +29,22 @@ class Jugador:
     def __str__(self):
         return f'{self.nombre}\nPuntaje: {self.puntaje}\n'
 
+def imagen_generica(img_dados_generico):
+    '''
+    Colocar imagen genérica previa a la tirada
+    '''
+    dice_relx = 0.20 # incrementa de a 0.12 para mantener simetria
+    dice_rely = 0.12
+    if len(dice) == 5:
+        for i in range(5):
+            dice[i].place_forget()
+            img_dados_generico[i].place(relx=dice_relx, rely=dice_rely)
+            dice_relx += 0.12
+    else:
+        for i in range(5):
+            img_dados_generico[i].place(relx=dice_relx, rely=dice_rely)
+            dice_relx += 0.12
+
 def submit(entrada, entry):#El uso principal es para poder implementar el wait_variable mas adelante
     '''
     Al presionar el boton Submit, entrada se modifica.
@@ -336,22 +352,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     '''
     global booleano
 
-    def imagen_generica():
-        '''
-        Colocar imagen genérica previa a la tirada
-        '''
-        dice_relx = 0.20 # incrementa de a 0.12 para mantener simetria
-        dice_rely = 0.12
-        if len(dice) == 5:
-            for i in range(5):
-                dice[i].place_forget()
-                img_dados_generico[i].place(relx=dice_relx, rely=dice_rely)
-                dice_relx += 0.12
-        else:
-            for i in range(5):
-                img_dados_generico[i].place(relx=dice_relx, rely=dice_rely)
-                dice_relx += 0.12
-                
+              
     #modifica la pantalla principal
     boton_n_partida.place_forget()
     boton_r_partida.place_forget()
@@ -425,7 +426,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
         #Numero de ronda de la partida en curso
         label_ronda_frameizq.configure(text=f'Ronda #: {turno} ', font=('roboto', 24, 'bold'))
         label_ronda_frameizq.place(relx=0.2, rely=0.02)
-        label_frameder.place(relx=0.2, rely=0.02)
+        label_frameder.place(relx=0.1, rely=0.22)
 
         for numero, jugador in JUGADORES.items(): #Dentro de cada turno, bucle para la ejecucion del tiro de cada jugador
 
@@ -447,19 +448,23 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
             for i,val in enumerate(puntajes_totales):
                 grilla_puntajes_der.item(str(i), text=val[0].nombre, values=(f'{val[1]}'))
 
-            imagen_generica()
+            imagen_generica(img_dados_generico)
 
             label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
             menu_despues_de_tirada(tirada(dados_elegidos, dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar)
             while booleano:
+                print('hola')
                 boton_submit.wait_variable(entrada)
             sumar_puntajes_individual(jugador)
             jugador.puntaje[0] += 1
             booleano = True
     total = sumar_puntajes_total(JUGADORES)
-    imagen_generica()
-    label.configure(text=f'{total[0][0].nombre} es el ganador con {total[0][1]} puntos.')
-
+    print(total)
+    if len(total) == 1:
+        imagen_generica(img_dados_generico)
+        label.configure(text=f'{total[0][0].nombre} es el ganador con {total[0][1]} puntos.')
+    else:
+        print('ronda de desempate')
         
 
 
