@@ -13,6 +13,7 @@ dice = []
 dados_elegidos = []
 jugadas_tiro_actual = []
 booleano = True
+ronda_desempate = False
 
 
 
@@ -158,6 +159,8 @@ def plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, bo
     global booleano
     global dados_elegidos
 
+
+    print(jugador)
     #limpiar el centro de la GUI
     boton_tachar.place_forget()
     boton_plantar.place_forget()
@@ -304,15 +307,19 @@ def sumar_puntajes_total(JUGADORES):
             for i in lista_ordenada:
                 if i[1] == puntaje_igual:
                     jugadores_mismo_puntaje.append(i[0])
+        else:
+            jugadores_mismo_puntaje.append(lista_ordenada[0][0])
     except IndexError: jugadores_mismo_puntaje.append(lista_ordenada[0][0])
     
-    return lista_ordenada
+    return lista_ordenada, jugadores_mismo_puntaje
 
-def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar):
+def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar,boton_plantar_desempate):
     '''
     Se ingresan los dados al fin del tiro y se muestran las opciones disponibles
     '''
+
     global jugadas_tiro_actual
+    global ronda_desempate
     for i in jugadas_tiro_actual: # reiniciar la lista de jugadas para el tiro actual
         i.place_forget()
     jugadas_tiro_actual.clear()
@@ -335,18 +342,83 @@ def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, lab
     boton_submit.configure(text='', state='disabled', fg_color='grey')
     if nro_tiro == 3:
         if len(grandes) == 0:
-            boton_tachar.place(relx=0.35, rely=0.80)
-            return
-        boton_plantar.place(relx=0.30, rely=0.80)
-        boton_tachar.place(relx=0.45, rely=0.80)
+            if not ronda_desempate:
+                boton_tachar.place(relx=0.35, rely=0.80)
+                #boton_plantar.place(relx=0.30, rely=0.80)
+            else: boton_plantar_desempate.place(relx=0.30, rely=0.80)
+        if not ronda_desempate:
+            boton_plantar.place(relx=0.30, rely=0.80)
+            boton_tachar.place(relx=0.45, rely=0.80)
     else:
         if len(grandes) == 0:
             boton_elegir_dados.place(relx=0.35, rely=0.80)
         else:
             boton_elegir_dados.place(relx=0.30, rely=0.80)
-            boton_plantar.place(relx=0.45, rely=0.80)
+            if not ronda_desempate:
+                boton_plantar.place(relx=0.45, rely=0.80)
+            else : boton_plantar_desempate.place(relx=0.30, rely=0.80)
 
-def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, grilla_puntajes_izq, grilla_puntajes_der, frame_der, label_frameder, bienvenido, img_dados_generico, boton_elegir_dados, boton_plantar):
+def tiro_desempate(JUGADORES, jugador, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, id_elemento_izq, grilla_puntajes_izq, grilla_puntajes_der, img_dados_generico, label, entrada, boton_submit, root, boton_elegir_dados, boton_plantar, boton_tachar,entry):
+    
+    '''
+    En caso de empate se juega una ronda para determinar el ganador.
+    '''
+    global ronda_desempate
+    global booleano
+    ronda_desempate = True
+    boton_plantar_desempate = ctk.CTkButton(master=root, width=150, height=50, text='Plantar d', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
+    
+    print('inicio ronda desempate')
+    print(JUGADORES)
+    for jugador in JUGADORES:
+            total = jugador.puntaje[13]
+            jugador.puntaje = [1,1,None,None,None,None,None,None,None,None,None,None,None,total]
+            print(jugador)
+            #Panel izquierdo con la información del jugador y su numero de tiro
+            label_ronda_frameizq.configure(text=f'Ronda desempate', font=('roboto', 20, 'bold'))
+            label_ronda_frameizq.place_forget()
+            label_ronda_frameizq.place(relx=0.1, rely=0.02)
+            label_jugador_frameizq.configure(text=f'Jugador:\n{jugador.nombre}', font=('roboto', 20, 'bold'))
+            label_tiro_frameizq.configure(text=f'Tiro #: {jugador.puntaje[1]}', font=('roboto', 20, 'bold'))
+            label_tiro_frameizq.place_forget()
+            label_tiro_frameizq.place(relx=0.1, rely=0.06)
+            
+            #Tabla con el puntaje parcial del jugador
+            indice_puntaje = 1
+            for i in range(id_elemento_izq-1):
+                indice_puntaje +=1
+                grilla_puntajes_izq.item(str(i), values=(f'X' if jugador.puntaje[indice_puntaje] == 0 else jugador.puntaje[indice_puntaje]) if jugador.puntaje[indice_puntaje] is not None else 0)
+            grilla_puntajes_izq.item('11', values=(jugador.puntaje[13]) if jugador.puntaje[13] is not None else 0) #Total aparte para evitar que sea 'X' cuando total es 0
+        
+            imagen_generica(img_dados_generico)
+
+            label.configure(text=f'Es el turno del jugador: {jugador.nombre}')
+            menu_despues_de_tirada(tirada(dados_elegidos, dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar,boton_plantar_desempate)
+            print(jugadas_tiro_actual)
+            while booleano:
+                boton_submit.wait_variable(entrada)
+            booleano = True
+            boton_plantar_desempate.place_forget()
+            print(jugador, 'antes')
+            sumar_puntajes_individual(jugador)
+            print(jugador, 'despues')
+            #Actualizar grilla derecha
+            for i,val in enumerate(JUGADORES):
+                grilla_puntajes_der.item(str(i), text=val.nombre, values=(f'{val.puntaje[13]}'))
+    max_puntaje = -1
+    for i in JUGADORES:
+        print(f'desempate jugadores \n {i}')
+        if i.puntaje[13] >= max_puntaje:
+            max_puntaje = i.puntaje[13]
+    ganador = []
+    for i in JUGADORES:
+        if i.puntaje[13] == max_puntaje:
+            ganador.append(i)
+    ronda_desempate = False
+    
+    return ganador
+
+def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_partida, boton_puntajes_altos, frame_izq, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, grilla_puntajes_izq, grilla_puntajes_der, frame_der, label_frameder, bienvenido, img_dados_generico, boton_elegir_dados, boton_plantar, boton_plantar_desempate):
     '''
     Comienza nueva partida.
     '''
@@ -360,7 +432,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
     boton_submit.configure(text='Enter!', fg_color='blue',state='normal')
 
     #Creacion botones elegir, plantar y tachar
-    boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar, label_tiro_frameizq), dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
+    boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar, label_tiro_frameizq), dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
     boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
     boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label))
 
@@ -421,7 +493,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
         grilla_puntajes_der.tag_configure('impar', background='light blue')
     grilla_puntajes_der.place(relx=0.1,rely=0.3)
 
-    for turno in range(1,12): #Bucle para la ejecucion de los turnos
+    for turno in range(1): #Bucle para la ejecucion de los turnos
 
         #Numero de ronda de la partida en curso
         label_ronda_frameizq.configure(text=f'Ronda #: {turno} ', font=('roboto', 24, 'bold'))
@@ -436,6 +508,17 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
             label_tiro_frameizq.configure(text=f'Tiro #: {jugador.puntaje[1]}', font=('roboto', 24, 'bold'))
             label_tiro_frameizq.place(relx=0.2, rely=0.06)
             
+
+            imagen_generica(img_dados_generico)
+
+            label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
+            menu_despues_de_tirada(tirada(dados_elegidos, dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate)
+            while booleano:
+                boton_submit.wait_variable(entrada)
+            sumar_puntajes_individual(jugador)
+            jugador.puntaje[0] += 1
+            booleano = True
+
             #Tabla con el puntaje parcial del jugador
             indice_puntaje = 1
             for i in range(id_elemento_izq-1):
@@ -444,28 +527,21 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
             grilla_puntajes_izq.item('11', values=(jugador.puntaje[13]) if jugador.puntaje[13] is not None else 0) #Total aparte para evitar que sea 'X' cuando total es 0
 
             #Tabla con el puntaje total de todos los jugadores
-            puntajes_totales = sumar_puntajes_total(JUGADORES)
+            puntajes_totales = sumar_puntajes_total(JUGADORES)[0]
             for i,val in enumerate(puntajes_totales):
                 grilla_puntajes_der.item(str(i), text=val[0].nombre, values=(f'{val[1]}'))
-
-            imagen_generica(img_dados_generico)
-
-            label.configure(text=f'Es el turno del jugador #{numero}: {jugador.nombre}')
-            menu_despues_de_tirada(tirada(dados_elegidos, dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar)
-            while booleano:
-                print('hola')
-                boton_submit.wait_variable(entrada)
-            sumar_puntajes_individual(jugador)
-            jugador.puntaje[0] += 1
-            booleano = True
-    total = sumar_puntajes_total(JUGADORES)
-    print(total)
+    total = sumar_puntajes_total(JUGADORES)[1]
+    print(f'total de ganadores {total}')
     if len(total) == 1:
         imagen_generica(img_dados_generico)
-        label.configure(text=f'{total[0][0].nombre} es el ganador con {total[0][1]} puntos.')
+        label.configure(text=f'{total[0].nombre} es el ganador con {total[0].puntaje[13]} puntos.')
     else:
-        print('ronda de desempate')
-        
+        ganador = tiro_desempate(total, jugador, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, id_elemento_izq, grilla_puntajes_izq, grilla_puntajes_der, img_dados_generico, label, entrada, boton_submit, root, boton_elegir_dados, boton_plantar, boton_tachar,entry)
+        print(f'ganador \n{ganador}')
+        #while len(ganador) >1:
+        #    ganador = tiro_desempate(total, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, id_elemento_izq, grilla_puntajes_izq, grilla_puntajes_der, img_dados_generico, label, entrada, boton_submit, root, boton_elegir_dados, boton_plantar, boton_tachar)
+        #    label.configure(text=f'{ganador[0].nombre} es el ganador.')
+    print('fin')
 
 
 # def reanudar_partida(numero_partida:int):
