@@ -4,6 +4,7 @@ from collections import defaultdict
 from PIL import Image
 import random
 import os
+import time
 
 cwd = os.getcwd()
 UBICACION_EN_TABLERO = {'Numero de ronda':0,'Numero de tiro':1,'1':2, '2':3, '3':4, '4':5, '5':6, '6':7, 'Escalera':8, 'Full':9, 'Poker':10, 'Generala':11, 'Generala Doble':12, 'total':13}
@@ -56,28 +57,35 @@ def tirada(dados_elegidos, dice, entrada, boton_submit, root, label, img_dados_g
     '''
     Realiza la tirada de dados. Toma una lista (vacia o no) y retorna una lista de dados arrojados
     '''
+    def update_dice_images():
+        label_dados_girando.place_forget()
+        dice_relx = 0.20  # incrementa de a 0.12 para mantener simetria
+        dice_rely = 0.15
+        for i in dados_elegidos:
+            img = ctk.CTkImage(Image.open(f'{cwd}/resources/dice{i}.png'), size=(100, 100))
+            img_label = ctk.CTkLabel(master=root, text='', image=img)
+            img_label.place(relx=dice_relx, rely=dice_rely)
+            dice.append(img_label)
+            dice_relx += 0.12
+
     dados_tirados = []
     boton_submit.wait_variable(entrada)
     label.place_forget()
-    for _ in range((5-len(dados_elegidos))):
-        dados_tirados.append(random.randint(1,6))
+    for _ in range((5 - len(dados_elegidos))):
+        dados_tirados.append(random.randint(1, 6))
     dados_elegidos.extend(dados_tirados)
     dados_elegidos.sort()
 
-    #Creacion de las imagenes de dados
+    # Creacion de las imagenes de dados
     for i in range(5):
         img_dados_generico[i].place_forget()
         if len(dice) == 5:
             dice[i].place_forget()
     dice.clear()
-    dice_relx = 0.20 # incrementa de a 0.12 para mantener simetria
-    dice_rely = 0.15
-    for i in dados_elegidos:
-        img = ctk.CTkImage(Image.open(f'{cwd}/resources/dice{i}.png'),size=(100,100))
-        img_label = ctk.CTkLabel(master=root,text='', image=img)
-        img_label.place(relx=dice_relx, rely=dice_rely)
-        dice.append(img_label)
-        dice_relx += 0.12
+    dados_girando = ctk.CTkImage(Image.open(f'{cwd}/resources/dice-spinning.gif'), size=(300, 300))
+    label_dados_girando = ctk.CTkLabel(master=root, text='', image=dados_girando)
+    label_dados_girando.place(relx=0.20, rely=0.15)
+    root.after(2000, update_dice_images)  # Schedule the update_dice_images() function to run after 2 seconds
     return dados_elegidos
 
 def check_jugadas_grandes(dados_elegidos,nro_tiro,jugador):
@@ -153,7 +161,7 @@ def elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton
     label_tiro_frameizq.configure(text=f'Tiro #{jugador.puntaje[1]}')
     return dados_elegidos
 
-def plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar):
+def plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate):
     
     global jugadas_tiro_actual
     global booleano
@@ -165,6 +173,7 @@ def plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, bo
     boton_tachar.place_forget()
     boton_plantar.place_forget()
     boton_elegir_dados.place_forget()
+    boton_plantar_desempate.place_forget()
     label.configure(text='Elija la jugada que desea plantar: ', font=('roboto',18))
 
     jugadas = check_jugadas_grandes(dados_elegidos, jugador.puntaje[1],jugador)
@@ -313,7 +322,7 @@ def sumar_puntajes_total(JUGADORES):
     
     return lista_ordenada, jugadores_mismo_puntaje
 
-def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar,boton_plantar_desempate):
+def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate):
     '''
     Se ingresan los dados al fin del tiro y se muestran las opciones disponibles
     '''
@@ -331,6 +340,9 @@ def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, lab
     label.place_forget()
     label.configure(text='Jugadas: ', font=('roboto',18))
     label.place(relx=0.20, rely=0.45)
+
+
+    print(type(boton_plantar), boton_plantar)
     
     for i,jug in enumerate(grandes, start=1):
         label_lista_jugadas = ctk.CTkLabel(master=root, text=(f'{i}- {jug}                '), font=('roboto',16))
@@ -341,14 +353,14 @@ def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, lab
         rely += 0.05
     boton_submit.configure(text='', state='disabled', fg_color='grey')
     if nro_tiro == 3:
-        if len(grandes) == 0:
-            if not ronda_desempate:
-                boton_tachar.place(relx=0.35, rely=0.80)
-                #boton_plantar.place(relx=0.30, rely=0.80)
-            else: boton_plantar_desempate.place(relx=0.30, rely=0.80)
         if not ronda_desempate:
-            boton_plantar.place(relx=0.30, rely=0.80)
-            boton_tachar.place(relx=0.45, rely=0.80)
+            if len(grandes) == 0:
+                boton_tachar.place(relx=0.35, rely=0.80)
+            else:
+                boton_plantar.place(relx=0.30, rely=0.80)
+                boton_tachar.place(relx=0.45, rely=0.80)
+        else:
+            boton_plantar_desempate.place(relx=0.30, rely=0.80)
     else:
         if len(grandes) == 0:
             boton_elegir_dados.place(relx=0.35, rely=0.80)
@@ -356,9 +368,9 @@ def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, lab
             boton_elegir_dados.place(relx=0.30, rely=0.80)
             if not ronda_desempate:
                 boton_plantar.place(relx=0.45, rely=0.80)
-            else : boton_plantar_desempate.place(relx=0.30, rely=0.80)
+            else : boton_plantar_desempate.place(relx=0.45, rely=0.80)
 
-def tiro_desempate(JUGADORES, jugador, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, id_elemento_izq, grilla_puntajes_izq, grilla_puntajes_der, img_dados_generico, label, entrada, boton_submit, root, boton_elegir_dados, boton_plantar, boton_tachar,entry):
+def tiro_desempate(JUGADORES, jugador, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, id_elemento_izq, grilla_puntajes_izq, grilla_puntajes_der, img_dados_generico, label, entrada, boton_submit, root, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate, entry):
     
     '''
     En caso de empate se juega una ronda para determinar el ganador.
@@ -366,7 +378,7 @@ def tiro_desempate(JUGADORES, jugador, label_ronda_frameizq, label_jugador_frame
     global ronda_desempate
     global booleano
     ronda_desempate = True
-    boton_plantar_desempate = ctk.CTkButton(master=root, width=150, height=50, text='Plantar d', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
+    boton_plantar_desempate.configure(command=lambda: plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
     
     print('inicio ronda desempate')
     print(JUGADORES)
@@ -433,7 +445,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
 
     #Creacion botones elegir, plantar y tachar
     boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar, label_tiro_frameizq), dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
-    boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar))
+    boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
     boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label))
 
     
@@ -493,7 +505,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
         grilla_puntajes_der.tag_configure('impar', background='light blue')
     grilla_puntajes_der.place(relx=0.1,rely=0.3)
 
-    for turno in range(1): #Bucle para la ejecucion de los turnos
+    for turno in range(12): #Bucle para la ejecucion de los turnos
 
         #Numero de ronda de la partida en curso
         label_ronda_frameizq.configure(text=f'Ronda #: {turno} ', font=('roboto', 24, 'bold'))
@@ -536,7 +548,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
         imagen_generica(img_dados_generico)
         label.configure(text=f'{total[0].nombre} es el ganador con {total[0].puntaje[13]} puntos.')
     else:
-        ganador = tiro_desempate(total, jugador, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, id_elemento_izq, grilla_puntajes_izq, grilla_puntajes_der, img_dados_generico, label, entrada, boton_submit, root, boton_elegir_dados, boton_plantar, boton_tachar,entry)
+        ganador = tiro_desempate(total, jugador, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, id_elemento_izq, grilla_puntajes_izq, grilla_puntajes_der, img_dados_generico, label, entrada, boton_submit, root, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate, entry)
         print(f'ganador \n{ganador}')
         #while len(ganador) >1:
         #    ganador = tiro_desempate(total, label_ronda_frameizq, label_jugador_frameizq, label_tiro_frameizq, id_elemento_izq, grilla_puntajes_izq, grilla_puntajes_der, img_dados_generico, label, entrada, boton_submit, root, boton_elegir_dados, boton_plantar, boton_tachar)

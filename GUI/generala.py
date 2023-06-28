@@ -54,7 +54,7 @@ boton_submit = ctk.CTkButton(master=root,text='', fg_color="grey", state='disabl
 boton_submit.grid(row=3, column=7, padx=(20, 20), pady=(20, 20), sticky="nsew")
 boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: funciones.elegir_dados())
 boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: funciones.tachar())
-boton_plantar_desempate = 0
+boton_plantar_desempate = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal')
 #Consulta a la BBDD por el numero de la ultima partida
 numero_partida = 1
 
