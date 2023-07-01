@@ -82,10 +82,10 @@ def tirada(dados_elegidos, dice, entrada, boton_submit, root, label, img_dados_g
         if len(dice) == 5:
             dice[i].place_forget()
     dice.clear()
-    dados_girando = ctk.CTkImage(Image.open(f'{cwd}/resources/dice-spinning.gif'), size=(300, 300))
+    dados_girando = ctk.CTkImage(Image.open(f'{cwd}/resources/dice-spinning.gif'), size=(100, 100))
     label_dados_girando = ctk.CTkLabel(master=root, text='', image=dados_girando)
     label_dados_girando.place(relx=0.20, rely=0.15)
-    root.after(2000, update_dice_images)  # Schedule the update_dice_images() function to run after 2 seconds
+    root.after(2000, update_dice_images)  # programa update dice para que se ejecute luego de 2 segundos
     return dados_elegidos
 
 def check_jugadas_grandes(dados_elegidos,nro_tiro,jugador):
@@ -161,42 +161,49 @@ def elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton
     label_tiro_frameizq.configure(text=f'Tiro #{jugador.puntaje[1]}')
     return dados_elegidos
 
-def plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate):
+def plantar(jugador, root, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate):
     
     global jugadas_tiro_actual
     global booleano
     global dados_elegidos
 
-
-    print(jugador)
     #limpiar el centro de la GUI
     boton_tachar.place_forget()
     boton_plantar.place_forget()
     boton_elegir_dados.place_forget()
     boton_plantar_desempate.place_forget()
+    for i in jugadas_tiro_actual:
+        i.place_forget()
     label.configure(text='Elija la jugada que desea plantar: ', font=('roboto',18))
 
     jugadas = check_jugadas_grandes(dados_elegidos, jugador.puntaje[1],jugador)
     jugadas.extend(check_jugadas_chicas(dados_elegidos,jugador))
 
-    #activar boton submit y entrada de texto
+    #activar boton submit
     boton_submit.configure(text='Confirmar!', fg_color='blue', state='normal', hover_color='light blue')
-    entry.configure(state='normal')
-    boton_submit.wait_variable(entrada)
-    x = entry.get()
-    while not x.isdigit() or int(x)<=0 or int(x)>len(jugadas): #Validacion de entrada
-        CTkMessagebox(title='Generala', icon = 'cancel', message = f'Seleccione la jugada utilizando un NUMERO del 1 al {len(jugadas)}', option_1 = 'OK', button_color='blue')
-        boton_submit.wait_variable(entrada)
-        x = entry.get()
-    entry.delete(0, ctk.END) #Reinicia el texto del entry box
-    entry.configure(state='disabled') #Deshabilita el entry box
 
-    for i in jugadas_tiro_actual:
+    #radiobutton
+    radiobuttons = []
+    radio_var = ctk.IntVar()
+    for i,val in enumerate(jugadas, start=1):
+        i = ctk.CTkRadioButton(master=root, text=val, variable=radio_var, value=i, font=('roboto',16))
+        radiobuttons.append(i)
+    rely = 0.50
+    for i in radiobuttons:
+        i.place(relx = 0.20, rely=rely)
+        rely += 0.05
+        
+    boton_submit.wait_variable(entrada)
+    x = radio_var.get()
+
+    for i in radiobuttons:
         i.place_forget()
+    radiobuttons.clear()
     jugadas_tiro_actual.clear()
 
     #Seleccion de jugada a plantar (jugadas grandes es 1 elemento en la lista, generala doble 2 y las jugadas chicas 3(x al y))
     lista_jugada_plantar = jugadas[int(x)-1].split()
+    
     if len(lista_jugada_plantar) == 2:
         jugada_plantar = 'Generala Doble'
     else:
@@ -248,40 +255,46 @@ def tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_sub
     jugadas_tiro_actual.clear()
     tachables = []
     indice_tachables = 1
-    rely = 0.50
-    rely2= 0.50
+    
     for ind,j in enumerate(jugador.puntaje[2:-1]):
         if j is None:
-            label_tachables = ctk.CTkLabel(master=root, text=(f'{indice_tachables}- {LISTA_JUGADAS[ind]}                '), font=('roboto',14))
-            jugadas_tiro_actual.append(label_tachables)
+            tachables.append(f'{LISTA_JUGADAS[ind]}')    
         indice_tachables +=1
-        tachables.append(f'{LISTA_JUGADAS[ind]}')
-    if len(jugadas_tiro_actual) >= 6:
-        for ind,_ in enumerate(jugadas_tiro_actual):
-            if ind < 6:
-                _.place(relx=0.20, rely=rely)
+
+    radiobuttons = []
+    radio_var = ctk.IntVar()
+    def radioprint():
+        print(radio_var.get())
+    for i,val in enumerate(tachables, start=1):
+        i = ctk.CTkRadioButton(master=root, text=val, variable=radio_var, value=i, font=('roboto',16), command=radioprint)
+        radiobuttons.append(i)
+    rely = 0.50
+    rely2= 0.50
+    if len(tachables) < 7:
+        for i in radiobuttons:
+            i.place(relx = 0.20, rely=rely)
+            rely += 0.05
+    else:
+        for i,val in enumerate(radiobuttons):
+            if i < 6:
+                val.place(relx=0.20, rely=rely)
                 rely += 0.05
             elif ind >=6:
-                _.place(relx=0.40, rely=rely2)
+                val.place(relx=0.40, rely=rely2)
                 rely2 += 0.05
-    else:
-        for _ in jugadas_tiro_actual:
-            _.place(relx=0.20, rely=rely)
-            rely += 0.05
-    entry.configure(state='normal')
-    boton_submit.wait_variable(entrada)
-    x = entry.get()
-    while not x.isdigit(): #Validacion de entrada
-        CTkMessagebox(title='Generala', icon = 'cancel', message = 'Seleccione la jugada utilizando NUMEROS', option_1 = 'OK', button_color='blue')
-        boton_submit.wait_variable(entrada)
-        x = entry.get()
-    entry.delete(0, ctk.END) #Reinicia el texto del entry box
-    entry.configure(state='disabled')
-    label.configure(text=f'Se ha tachado la siguiente jugada: \n {tachables[int(x)-1]}', font=('roboto',18))
 
+        
+    boton_submit.wait_variable(entrada)
+    x = radio_var.get()
+
+    for i in radiobuttons:
+        i.place_forget()
+    radiobuttons.clear()
     for i in jugadas_tiro_actual:
         i.place_forget()
     jugadas_tiro_actual.clear()
+    
+    label.configure(text=f'Se ha tachado la siguiente jugada: \n {tachables[int(x)-1]}', font=('roboto',18))
 
     boton_submit.wait_variable(entrada)
     jugador.puntaje[UBICACION_EN_TABLERO[tachables[int(x)-1]]] = 0 #modifica el valor de determinada jugada, de None a 0, para indicar que esta anulada. en GUI figura X
@@ -329,6 +342,19 @@ def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, lab
 
     global jugadas_tiro_actual
     global ronda_desempate
+    
+    def mostrar_jugadas():
+        label.place_forget()
+        label.configure(text='Jugadas: ', font=('roboto',18))
+        label.place(relx=0.20, rely=0.45)
+        for i,jug in enumerate(grandes, start=1):
+            label_lista_jugadas = ctk.CTkLabel(master=root, text=(f'{jug}                '), font=('roboto',16))
+            jugadas_tiro_actual.append(label_lista_jugadas)
+        rely = 0.50
+        for i in jugadas_tiro_actual:
+            i.place(relx=0.20, rely=rely)
+            rely += 0.05
+
     for i in jugadas_tiro_actual: # reiniciar la lista de jugadas para el tiro actual
         i.place_forget()
     jugadas_tiro_actual.clear()
@@ -337,20 +363,9 @@ def menu_despues_de_tirada(dados_elegidos, nro_tiro, jugador, root, entrada, lab
     chicas = check_jugadas_chicas(dados_elegidos,jugador)
     grandes.extend(chicas)
     
-    label.place_forget()
-    label.configure(text='Jugadas: ', font=('roboto',18))
-    label.place(relx=0.20, rely=0.45)
-
-
-    print(type(boton_plantar), boton_plantar)
     
-    for i,jug in enumerate(grandes, start=1):
-        label_lista_jugadas = ctk.CTkLabel(master=root, text=(f'{i}- {jug}                '), font=('roboto',16))
-        jugadas_tiro_actual.append(label_lista_jugadas)
-    rely = 0.50
-    for i in jugadas_tiro_actual:
-        i.place(relx=0.20, rely=rely)
-        rely += 0.05
+    root.after(2000, mostrar_jugadas)
+
     boton_submit.configure(text='', state='disabled', fg_color='grey')
     if nro_tiro == 3:
         if not ronda_desempate:
@@ -378,14 +393,12 @@ def tiro_desempate(JUGADORES, jugador, label_ronda_frameizq, label_jugador_frame
     global ronda_desempate
     global booleano
     ronda_desempate = True
-    boton_plantar_desempate.configure(command=lambda: plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
+    boton_plantar_desempate.configure(command=lambda: plantar(jugador, root, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
     
-    print('inicio ronda desempate')
-    print(JUGADORES)
     for jugador in JUGADORES:
             total = jugador.puntaje[13]
             jugador.puntaje = [1,1,None,None,None,None,None,None,None,None,None,None,None,total]
-            print(jugador)
+            
             #Panel izquierdo con la información del jugador y su numero de tiro
             label_ronda_frameizq.configure(text=f'Ronda desempate', font=('roboto', 20, 'bold'))
             label_ronda_frameizq.place_forget()
@@ -406,20 +419,18 @@ def tiro_desempate(JUGADORES, jugador, label_ronda_frameizq, label_jugador_frame
 
             label.configure(text=f'Es el turno del jugador: {jugador.nombre}')
             menu_despues_de_tirada(tirada(dados_elegidos, dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1], jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar,boton_plantar_desempate)
-            print(jugadas_tiro_actual)
             while booleano:
                 boton_submit.wait_variable(entrada)
             booleano = True
             boton_plantar_desempate.place_forget()
-            print(jugador, 'antes')
             sumar_puntajes_individual(jugador)
-            print(jugador, 'despues')
+            
             #Actualizar grilla derecha
             for i,val in enumerate(JUGADORES):
                 grilla_puntajes_der.item(str(i), text=val.nombre, values=(f'{val.puntaje[13]}'))
+    
     max_puntaje = -1
     for i in JUGADORES:
-        print(f'desempate jugadores \n {i}')
         if i.puntaje[13] >= max_puntaje:
             max_puntaje = i.puntaje[13]
     ganador = []
@@ -445,7 +456,7 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
 
     #Creacion botones elegir, plantar y tachar
     boton_elegir_dados =ctk.CTkButton(master=root, width=150, height=50 , text='Elegir dados', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: menu_despues_de_tirada(tirada(elegir_dados(jugador, root, entrada, boton_submit, boton_elegir_dados, boton_plantar, label_tiro_frameizq), dice, entrada, boton_submit, root, label, img_dados_generico), jugador.puntaje[1],jugador, root, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
-    boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(jugador, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
+    boton_plantar = ctk.CTkButton(master=root, width=150, height=50, text='Plantar', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: plantar(jugador, root, entry, entrada, label, boton_submit, boton_elegir_dados, boton_plantar, boton_tachar, boton_plantar_desempate))
     boton_tachar = ctk.CTkButton(master=root, width=150, height=50, text='Tachar Jugada', font=('roboto', 16), fg_color="blue", state='normal', command=lambda: tachar(jugador, root, entry, entrada, boton_plantar, boton_tachar, boton_submit, label))
 
     
@@ -543,7 +554,6 @@ def nueva_partida(root, entrada, entry, boton_submit, boton_n_partida, boton_r_p
             for i,val in enumerate(puntajes_totales):
                 grilla_puntajes_der.item(str(i), text=val[0].nombre, values=(f'{val[1]}'))
     total = sumar_puntajes_total(JUGADORES)[1]
-    print(f'total de ganadores {total}')
     if len(total) == 1:
         imagen_generica(img_dados_generico)
         label.configure(text=f'{total[0].nombre} es el ganador con {total[0].puntaje[13]} puntos.')

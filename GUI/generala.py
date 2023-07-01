@@ -8,7 +8,7 @@ import funciones
 ## CHEQUEAR AFTER SCRIPTS cuando se cierra la app
 ## AGREGAR ALGO PARA FRENAR EL CIERRE DE LA VENTANA HASTA QUE GUARDE EN BBDD
 #falta agregar que generala servida gana el juego
-#Crear segunda ventana con un video y un time sleep hasta que se cierre la ventana
+#cambiar imagen en la tirada por un gif o video
 #en plantar y tachar usar radiobuttons
 #agregar boton volver al principio
 
